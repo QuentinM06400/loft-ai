@@ -534,7 +534,11 @@ export default function LoftAI() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
-  const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(window.matchMedia?.("(prefers-color-scheme: dark)").matches || false);
+  }, []);
 
   const cssVars = {
     "--bg": isDark ? "#0F1117" : "#FAFAF8",
