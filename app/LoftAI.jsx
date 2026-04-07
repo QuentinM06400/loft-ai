@@ -354,12 +354,12 @@ const LANGUAGES = [
 ];
 
 const WELCOME_MESSAGES = {
-  fr: "Bienvenue dans votre loft \u00e0 Cannes ! \u2728\n\nJe suis **LOFT AI**, votre assistant personnel pour un s\u00e9jour parfait.\n\nPosez-moi toutes vos questions : fonctionnement de l'appartement, bonnes adresses, activit\u00e9s, transports... Je suis disponible 24h/24.\n\nComment puis-je vous aider ?",
-  en: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your personal assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?",
-  es: "\u00a1Bienvenido a su loft en Cannes! \u2728\n\nSoy **LOFT AI**, su asistente personal para una estancia perfecta.\n\nPreg\u00fanteme lo que quiera: funcionamiento del apartamento, mejores direcciones, actividades, transporte... Estoy disponible 24/7.\n\n\u00bfC\u00f3mo puedo ayudarle?",
-  de: "Willkommen in Ihrem Loft in Cannes! \u2728\n\nIch bin **LOFT AI**, Ihr pers\u00f6nlicher Assistent f\u00fcr einen perfekten Aufenthalt.\n\nFragen Sie mich alles: Wohnungsfunktionen, beste Adressen, Aktivit\u00e4ten, Transport... Ich bin rund um die Uhr verf\u00fcgbar.\n\nWie kann ich Ihnen helfen?",
-  it: "Benvenuti nel vostro loft a Cannes! \u2728\n\nSono **LOFT AI**, il vostro assistente personale per un soggiorno perfetto.\n\nChiedetemi tutto: funzionamento dell'appartamento, migliori indirizzi, attivit\u00e0, trasporti... Sono disponibile 24/7.\n\nCome posso aiutarvi?",
-  default: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your personal assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?"
+  fr: "Bienvenue dans votre loft \u00e0 Cannes ! \u2728\n\nJe suis **LOFT AI**, votre assistant virtuel propuls\u00e9 par intelligence artificielle, pour un s\u00e9jour parfait.\n\nPosez-moi toutes vos questions : fonctionnement de l'appartement, bonnes adresses, activit\u00e9s, transports... Je suis disponible 24h/24.\n\nComment puis-je vous aider ?",
+  en: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?",
+  es: "\u00a1Bienvenido a su loft en Cannes! \u2728\n\nSoy **LOFT AI**, su asistente virtual impulsado por inteligencia artificial, para una estancia perfecta.\n\nPreg\u00fanteme lo que quiera: funcionamiento del apartamento, mejores direcciones, actividades, transporte... Estoy disponible 24/7.\n\n\u00bfC\u00f3mo puedo ayudarle?",
+  de: "Willkommen in Ihrem Loft in Cannes! \u2728\n\nIch bin **LOFT AI**, Ihr KI-gest\u00fctzter virtueller Assistent f\u00fcr einen perfekten Aufenthalt.\n\nFragen Sie mich alles: Wohnungsfunktionen, beste Adressen, Aktivit\u00e4ten, Transport... Ich bin rund um die Uhr verf\u00fcgbar.\n\nWie kann ich Ihnen helfen?",
+  it: "Benvenuti nel vostro loft a Cannes! \u2728\n\nSono **LOFT AI**, il vostro assistente virtuale alimentato da intelligenza artificiale, per un soggiorno perfetto.\n\nChiedetemi tutto: funzionamento dell'appartamento, migliori indirizzi, attivit\u00e0, trasporti... Sono disponibile 24/7.\n\nCome posso aiutarvi?",
+  default: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?"
 };
 
 const QUICK_LABELS = {
@@ -387,6 +387,133 @@ function getQuickActions(lang) {
 
 const WHATSAPP_NUMBER = "33621858804";
 const PHONE_NUMBER = "tel:+33621858804";
+
+const CONSENT_TEXTS = {
+  fr: {
+    title: "Bienvenue sur LOFT AI",
+    subtitle: "Votre concierge virtuel propuls\u00e9 par intelligence artificielle",
+    body: "En utilisant LOFT AI, vous acceptez que :",
+    points: [
+      "Vous interagissez avec une intelligence artificielle, et non un \u00eatre humain",
+      "Vos conversations sont enregistr\u00e9es pour am\u00e9liorer le service (dur\u00e9e : 90 jours max)",
+      "Aucune donn\u00e9e personnelle n'est partag\u00e9e avec des tiers"
+    ],
+    privacy: "Politique de confidentialit\u00e9",
+    accept: "J'accepte et je continue",
+    refuse: "Je refuse",
+    refuseMsg: "Vous pouvez toujours contacter Quentin directement par WhatsApp ou t\u00e9l\u00e9phone."
+  },
+  en: {
+    title: "Welcome to LOFT AI",
+    subtitle: "Your AI-powered virtual concierge",
+    body: "By using LOFT AI, you agree that:",
+    points: [
+      "You are interacting with an artificial intelligence, not a human",
+      "Your conversations are recorded to improve the service (max 90 days)",
+      "No personal data is shared with third parties"
+    ],
+    privacy: "Privacy Policy",
+    accept: "I accept and continue",
+    refuse: "I decline",
+    refuseMsg: "You can still contact Quentin directly via WhatsApp or phone."
+  },
+  default: {
+    title: "Welcome to LOFT AI",
+    subtitle: "Your AI-powered virtual concierge",
+    body: "By using LOFT AI, you agree that:",
+    points: [
+      "You are interacting with an artificial intelligence, not a human",
+      "Your conversations are recorded to improve the service (max 90 days)",
+      "No personal data is shared with third parties"
+    ],
+    privacy: "Privacy Policy",
+    accept: "I accept and continue",
+    refuse: "I decline",
+    refuseMsg: "You can still contact Quentin directly via WhatsApp or phone."
+  }
+};
+
+function ConsentPopup({ lang, onAccept, onRefuse }) {
+  const t = CONSENT_TEXTS[lang] || CONSENT_TEXTS.default;
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 1000
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 400, background: "var(--bg)", borderRadius: 20,
+        padding: "28px 24px", boxShadow: "0 12px 48px rgba(0,0,0,0.2)"
+      }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, background: "var(--accent)",
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            fontSize: 20, color: "#fff", fontWeight: 800, marginBottom: 10,
+            boxShadow: "0 4px 16px var(--accent-shadow)"
+          }}>L</div>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", margin: "0 0 4px" }}>{t.title}</h2>
+          <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: 0 }}>{t.subtitle}</p>
+        </div>
+
+        <p style={{ fontSize: 13, color: "var(--text-primary)", marginBottom: 10, fontWeight: 500 }}>{t.body}</p>
+
+        <div style={{ marginBottom: 16 }}>
+          {t.points.map((point, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              <span style={{ color: "var(--accent)", flexShrink: 0 }}>{"\u2713"}</span>
+              <span>{point}</span>
+            </div>
+          ))}
+        </div>
+
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{
+          display: "block", textAlign: "center", fontSize: 12, color: "var(--accent)",
+          marginBottom: 18, textDecoration: "underline"
+        }}>{t.privacy}</a>
+
+        <button onClick={onAccept} style={{
+          width: "100%", padding: "14px", borderRadius: 14, border: "none",
+          background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600,
+          cursor: "pointer", fontFamily: "inherit", marginBottom: 8,
+          boxShadow: "0 3px 12px var(--accent-shadow)"
+        }}>{t.accept}</button>
+
+        <button onClick={onRefuse} style={{
+          width: "100%", padding: "12px", borderRadius: 14,
+          border: "1px solid var(--border)", background: "transparent",
+          color: "var(--text-secondary)", fontSize: 13, cursor: "pointer", fontFamily: "inherit"
+        }}>{t.refuse}</button>
+      </div>
+    </div>
+  );
+}
+
+function RefusedScreen({ lang }) {
+  const t = CONSENT_TEXTS[lang] || CONSENT_TEXTS.default;
+  return (
+    <div style={{
+      height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      padding: 24, textAlign: "center", background: "var(--bg)"
+    }}>
+      <div style={{ fontSize: 40, marginBottom: 16 }}>{"\u{1F512}"}</div>
+      <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20, maxWidth: 300 }}>{t.refuseMsg}</p>
+      <div style={{ display: "flex", gap: 12 }}>
+        <a href={"https://wa.me/" + WHATSAPP_NUMBER} target="_blank" rel="noopener noreferrer" style={{
+          padding: "12px 20px", borderRadius: 12, background: "#25D366", color: "#fff",
+          textDecoration: "none", fontSize: 14, fontWeight: 600
+        }}>WhatsApp</a>
+        <a href={PHONE_NUMBER} style={{
+          padding: "12px 20px", borderRadius: 12, background: "var(--accent)", color: "#fff",
+          textDecoration: "none", fontSize: 14, fontWeight: 600
+        }}>Appeler</a>
+      </div>
+      <button onClick={() => window.location.reload()} style={{
+        marginTop: 20, background: "none", border: "none", color: "var(--accent)",
+        cursor: "pointer", fontSize: 13, fontFamily: "inherit", textDecoration: "underline"
+      }}>{"\u2190"} Revenir</button>
+    </div>
+  );
+}
 
 function TypingDots() {
   return (
@@ -493,7 +620,7 @@ function LanguageSelector({ onSelect }) {
       ) : (
         <div style={{ width: "100%", maxWidth: 340, animation: "scaleIn .3s ease" }}>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 10, textAlign: "center" }}>
-            {"Type your language / Écrivez votre langue"}
+            {"Type your language / \u00c9crivez votre langue"}
           </p>
           <div style={{ display: "flex", gap: 8 }}>
             <input
@@ -516,11 +643,16 @@ function LanguageSelector({ onSelect }) {
           <button onClick={() => setShowOther(false)} style={{
             marginTop: 10, background: "none", border: "none", color: "var(--text-secondary)",
             cursor: "pointer", fontSize: 13, fontFamily: "inherit", width: "100%", textAlign: "center"
-          }}>{"← Back to languages"}</button>
+          }}>{"\u2190 Back to languages"}</button>
         </div>
       )}
     </div>
   );
+}
+
+// Générer un ID unique pour chaque conversation
+function generateConvId() {
+  return "conv_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
 }
 
 export default function LoftAI() {
@@ -534,10 +666,22 @@ export default function LoftAI() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
+  // RGPD consent
+  const [consent, setConsent] = useState(null); // null = not yet, true = accepted, false = refused
+  const [showConsent, setShowConsent] = useState(false);
+
+  // Conversation tracking
+  const convIdRef = useRef(null);
+  const startedAtRef = useRef(null);
+
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     setIsDark(window.matchMedia?.("(prefers-color-scheme: dark)").matches || false);
+    // Check if consent was already given
+    const stored = localStorage.getItem("loftai_consent");
+    if (stored === "true") setConsent(true);
+    else if (stored === "false") setConsent(false);
   }, []);
 
   const cssVars = {
@@ -558,15 +702,61 @@ export default function LoftAI() {
   function handleLangSelect(code, label) {
     setLang(code);
     setLangLabel(label);
+    // Show consent popup after language selection
+    if (consent === null) {
+      setShowConsent(true);
+    } else {
+      startConversation(code, label);
+    }
+  }
+
+  function handleConsent() {
+    setConsent(true);
+    localStorage.setItem("loftai_consent", "true");
+    setShowConsent(false);
+    startConversation(lang, langLabel);
+  }
+
+  function handleRefuse() {
+    setConsent(false);
+    localStorage.setItem("loftai_consent", "false");
+    setShowConsent(false);
+  }
+
+  function startConversation(code, label) {
     const welcome = WELCOME_MESSAGES[code] || WELCOME_MESSAGES.default;
     setMessages([{ role: "assistant", content: welcome }]);
-    const langInstruction = `The guest selected language: ${label}. Always respond in ${label} from now on.`;
+    const langInstruction = "The guest selected language: " + label + ". Always respond in " + label + " from now on.";
     setHistory([{ role: "user", content: langInstruction }, { role: "assistant", content: welcome }]);
+    convIdRef.current = generateConvId();
+    startedAtRef.current = new Date().toISOString();
   }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  // Sauvegarder la conversation dans Redis après chaque réponse de l'assistant
+  async function saveConversation(updatedHistory) {
+    if (!consent || !convIdRef.current) return;
+    try {
+      const deviceInfo = /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop";
+      await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: convIdRef.current,
+          messages: updatedHistory,
+          language: lang,
+          startedAt: startedAtRef.current,
+          endedAt: new Date().toISOString(),
+          deviceInfo
+        })
+      });
+    } catch {
+      // Silently fail — ne pas gêner l'expérience utilisateur
+    }
+  }
 
   async function sendMessage(text) {
     const userText = text || input.trim();
@@ -597,7 +787,10 @@ export default function LoftAI() {
         : "Sorry, I couldn't process your request. Contact Quentin at +33 6 21 85 88 04.");
       const assistantMsg = { role: "assistant", content: reply };
       setMessages(prev => [...prev, assistantMsg]);
-      setHistory([...newHistory, { role: "assistant", content: reply }]);
+      const updatedHistory = [...newHistory, { role: "assistant", content: reply }];
+      setHistory(updatedHistory);
+      // Sauvegarder après chaque échange
+      saveConversation(updatedHistory);
     } catch {
       setMessages(prev => [...prev, {
         role: "assistant",
@@ -617,6 +810,26 @@ export default function LoftAI() {
       <div style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif", ...cssVars }}>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         <LanguageSelector onSelect={handleLangSelect} />
+      </div>
+    );
+  }
+
+  // Si consent refusé
+  if (consent === false) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif", ...cssVars }}>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <RefusedScreen lang={lang} />
+      </div>
+    );
+  }
+
+  // Si consent pas encore donné (popup visible)
+  if (showConsent) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif", ...cssVars }}>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <ConsentPopup lang={lang} onAccept={handleConsent} onRefuse={handleRefuse} />
       </div>
     );
   }
@@ -646,7 +859,7 @@ export default function LoftAI() {
           <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 1 }}>Cannes {"\u00B7"} {langLabel}</div>
         </div>
 
-        <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" style={{
+        <a href={"https://wa.me/" + WHATSAPP_NUMBER} target="_blank" rel="noopener noreferrer" style={{
           width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
           background: "#25D366", border: "none", cursor: "pointer", textDecoration: "none",
           boxShadow: "0 2px 8px rgba(37,211,102,0.3)", transition: "transform .15s"
@@ -740,7 +953,7 @@ export default function LoftAI() {
           </button>
         </div>
         <p style={{ textAlign: "center", color: "var(--text-secondary)", fontSize: 10, margin: "8px 0 0", opacity: 0.5 }}>
-          LOFT AI {"\u00B7"} Cannes
+          Assistant IA {"\u00B7"} <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>Confidentialit\u00e9</a> {"\u00B7"} LOFT AI Cannes
         </p>
       </div>
     </div>
