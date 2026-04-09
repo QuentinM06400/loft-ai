@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, BigNumberStepper, BigTextarea, C } from "../WizardUI";
+import { QuestionScreen, ContinueButton, BigButtonChoice, BigNumberStepper, BigTextarea, C } from "../WizardUI";
 
 const PROPERTY_TYPES = ["Studio", "1 chambre", "2 chambres", "3 chambres", "4+ chambres", "Maison", "Villa"];
 const isApartment = (t) => ["Studio", "1 chambre", "2 chambres", "3 chambres", "4+ chambres"].includes(t);
@@ -26,7 +26,6 @@ function NominatimAddressInput({ value = {}, onChange }) {
         const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=10&countrycodes=fr`;
         const res = await fetch(url, { headers: { "User-Agent": "loft-ai-wizard" } });
         const data = await res.json();
-        // Only show results with a road (actual street addresses, not suburbs/neighborhoods)
         const filtered = data.filter(item => item.address?.road).slice(0, 5);
         setSuggestions(filtered);
         setShowDropdown(filtered.length > 0);
@@ -39,7 +38,7 @@ function NominatimAddressInput({ value = {}, onChange }) {
     const street = [a.house_number, a.road].filter(Boolean).join(" ");
     const addr = street || item.display_name.split(",")[0];
     const city = a.city || a.town || a.village || a.municipality || "";
-    const postalCode = a.postcode || "";
+    const postalCode = (a.postcode || "").slice(0, 5);
     setInput(addr);
     setSuggestions([]);
     setShowDropdown(false);
@@ -102,17 +101,12 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
 
   const [q, setQ] = useState(0);
   const [vis, setVis] = useState(true);
-  const hist = useRef([]);
 
   function goTo(n) {
     setVis(false);
     setTimeout(() => { setQ(n); setVis(true); window.scrollTo({ top: 0, behavior: "instant" }); }, 400);
   }
-  function fwd(n) { hist.current = [...hist.current, q]; goTo(n); }
-  function bk() {
-    const p = hist.current[hist.current.length - 1];
-    if (p === undefined) { onBack?.(); } else { hist.current = hist.current.slice(0, -1); goTo(p); }
-  }
+  function fwd(n) { goTo(n); }
 
   const apt = isApartment(data.propertyType);
 
@@ -127,7 +121,6 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             columns={2}
             withOther
           />
-          <QuestionNav onBack={bk} onSkip={() => fwd(1)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -137,14 +130,12 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             onChange={v => onChange({ ...data, address: v.address, city: v.city, postalCode: v.postalCode, country: v.country })}
           />
           <ContinueButton onClick={() => fwd(apt ? 2 : 4)} label="Continuer →" />
-          <QuestionNav onBack={bk} onSkip={() => fwd(apt ? 2 : 4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 2 && (
         <QuestionScreen title="À quel étage se situe le logement ?" sub="0 = rez-de-chaussée" visible={vis}>
           <BigNumberStepper value={data.floor ?? 0} onChange={v => set("floor", v)} min={0} max={30} />
           <ContinueButton onClick={() => fwd(3)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 3 && (
@@ -155,7 +146,6 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             onChange={v => { set("hasElevator", v === "Oui"); fwd(4); }}
             columns={2}
           />
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 4 && (
@@ -169,14 +159,12 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             rows={5}
           />
           <ContinueButton onClick={() => fwd(5)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(5)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 5 && (
         <QuestionScreen title="Combien de voyageurs pouvez-vous accueillir ?" visible={vis}>
           <BigNumberStepper value={data.maxGuests ?? 4} onChange={v => set("maxGuests", v)} min={1} max={20} />
           <ContinueButton onClick={() => fwd(6)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(6)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 6 && (
@@ -187,7 +175,6 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             <BigNumberStepper value={data.bathrooms ?? 1} onChange={v => set("bathrooms", v)} min={0} max={10} label="Salle(s) de bain" />
           </div>
           <ContinueButton onClick={onNext} label="Étape suivante →" />
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
         </QuestionScreen>
       )}
     </>

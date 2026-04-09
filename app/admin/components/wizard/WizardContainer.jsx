@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { WizardStyles, C } from "./WizardUI";
+import { WizardStyles, QuestionNav, C } from "./WizardUI";
 import WizardWelcome      from "./WizardWelcome";
 import Step1Logement      from "./steps/Step1Logement";
 import Step2Acces         from "./steps/Step2Acces";
@@ -198,6 +198,13 @@ export default function WizardContainer({ password, onFinish }) {
 
         {/* Progress bar */}
         <ProgressBar step={step} />
+
+        {/* Global bottom nav */}
+        <QuestionNav
+          onBack={step > 0 ? goBack : undefined}
+          onSkip={step < 7 ? goNext : undefined}
+          skipLabel="Passer →"
+        />
 
         {/* Step content */}
         <div style={{ flex: 1, maxWidth: 620, width: "100%", margin: "0 auto", padding: "28px 20px 120px" }}>

@@ -1,6 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
-import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, MultiButtonChoice, BigTextInput, BigTextarea, ChipChecklist, InfoNote, C } from "../WizardUI";
+import { useState } from "react";
+import { QuestionScreen, ContinueButton, BigButtonChoice, MultiButtonChoice, BigTextInput, BigTextarea, ChipChecklist, InfoNote, C } from "../WizardUI";
 
 const CHECKIN_TIMES  = ["14:00", "15:00", "16:00", "Flexible", "Flexible sur demande"];
 const CHECKOUT_TIMES = ["10:00", "11:00", "12:00", "Flexible", "Flexible sur demande"];
@@ -12,7 +12,6 @@ const DEPARTURE_SUGGESTIONS = [
   "Lancer une machine de draps", "Vider le réfrigérateur", "Fermer la porte à clé",
 ];
 
-// Multi-select time choice with "Autre" inline text
 function MultiTimeChoice({ options, values = [], otherValue = "", onValuesChange, onOtherChange }) {
   const toggle = (opt) => {
     const next = values.includes(opt) ? values.filter(v => v !== opt) : [...values, opt];
@@ -75,22 +74,15 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
 
   const [q, setQ] = useState(0);
   const [vis, setVis] = useState(true);
-  const hist = useRef([]);
 
   function goTo(n) {
     setVis(false);
     setTimeout(() => { setQ(n); setVis(true); window.scrollTo({ top: 0, behavior: "instant" }); }, 400);
   }
-  function fwd(n) { hist.current = [...hist.current, q]; goTo(n); }
-  function bk() {
-    const p = hist.current[hist.current.length - 1];
-    if (p === undefined) onBack?.(); else { hist.current = hist.current.slice(0, -1); goTo(p); }
-  }
+  function fwd(n) { goTo(n); }
 
   const accessModes = data.accessModes || [];
-  const hasPersonalWelcome = accessModes.includes("Accueil en personne");
 
-  // Helpers for multi-time
   const checkinTimes = data.checkinTimes || (data.checkinTime ? [data.checkinTime] : []);
   const checkoutTimes = data.checkoutTimes || (data.checkoutTime ? [data.checkoutTime] : []);
 
@@ -102,11 +94,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
     const real = vals.filter(v => v !== "__autre__");
     onChange({ ...data, checkoutTimes: vals, checkoutTime: real.join(" / ") || data.checkoutTimeOther || "" });
   }
-
-  // Access mode "Autre" handling
-  const customAccessMode = data.accessModeOther || "";
-  const accessHasOther = accessModes.some(m => !ACCESS_MODES.includes(m) && m !== "Autre");
-  const accessOtherVal = accessModes.find(m => !ACCESS_MODES.includes(m)) || "";
 
   return (
     <>
@@ -125,7 +112,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(1)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(1)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -143,7 +129,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(2)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(2)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 2 && (
@@ -166,7 +151,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
                   }}>{sel ? "✓ " : ""}{mode}</button>
                 );
               })}
-              {/* Autre */}
               <button type="button" onClick={() => {
                 const hasOther = accessModes.some(m => !ACCESS_MODES.includes(m));
                 if (hasOther) {
@@ -195,7 +179,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             )}
             <ContinueButton onClick={() => fwd(accessModes.includes("Accueil en personne") ? 3 : 4)} disabled={accessModes.length === 0} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 3 && (
@@ -210,7 +193,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(4)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 4 && (
@@ -222,7 +204,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             <ContinueButton onClick={() => fwd(5)} label="Continuer →" />
             <button type="button" onClick={() => fwd(5)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas de code →</button>
           </div>
-          <QuestionNav onBack={bk} />
         </QuestionScreen>
       )}
       {q === 5 && (
@@ -233,7 +214,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
           <BigTextarea value={data.arrivalInstructions} onChange={v => set("arrivalInstructions", v)} rows={4} />
           <ContinueButton onClick={() => fwd(6)} />
           <button type="button" onClick={() => fwd(6)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas d'instructions particulières →</button>
-          <QuestionNav onBack={bk} />
         </QuestionScreen>
       )}
       {q === 6 && (
@@ -245,7 +225,6 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             placeholder="Ex : Vider le réfrigérateur..."
           />
           <ContinueButton onClick={onNext} label="Étape suivante →" />
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
         </QuestionScreen>
       )}
     </>

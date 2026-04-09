@@ -1,6 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
-import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, BigTextInput, ChipChecklist, C } from "../WizardUI";
+import { useState } from "react";
+import { QuestionScreen, ContinueButton, BigButtonChoice, BigTextInput, ChipChecklist, C } from "../WizardUI";
 
 const QUIET_TIMES   = ["21:00", "22:00", "23:00", "Pas de restriction"];
 const PARTY_OPTIONS = ["Oui", "Non", "Sous conditions", "Autre"];
@@ -17,24 +17,18 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
   const [showQuietOther, setShowQuietOther] = useState(
     data.quietHoursStart && !QUIET_TIMES.includes(data.quietHoursStart)
   );
-  const hist = useRef([]);
 
   function goTo(n) {
     setVis(false);
     setTimeout(() => { setQ(n); setVis(true); window.scrollTo({ top: 0, behavior: "instant" }); }, 400);
   }
-  function fwd(n) { hist.current = [...hist.current, q]; goTo(n); }
-  function bk() {
-    const p = hist.current[hist.current.length - 1];
-    if (p === undefined) onBack?.(); else { hist.current = hist.current.slice(0, -1); goTo(p); }
-  }
+  function fwd(n) { goTo(n); }
 
   return (
     <>
       {q === 0 && (
         <QuestionScreen title="À partir de quelle heure demandez-vous le silence ?" visible={vis}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Preset options */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
               {QUIET_TIMES.map(t => {
                 const sel = data.quietHoursStart === t;
@@ -54,7 +48,6 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
                   }}>{t}</button>
                 );
               })}
-              {/* Autre */}
               <button type="button" onClick={() => { setShowQuietOther(true); set("quietHoursStart", ""); }} style={{
                 minHeight: 52, padding: "12px 24px", borderRadius: 14,
                 border: showQuietOther ? `2px solid ${C.green}` : "2px solid rgba(0,0,0,0.1)",
@@ -80,7 +73,6 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(1)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -102,7 +94,6 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(2)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 2 && (
@@ -124,19 +115,16 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 3 && (
         <QuestionScreen title="Quelle est votre politique sur le tabac ?" visible={vis}>
           <BigButtonChoice options={SMOKE_OPTIONS} value={data.smokingPolicy} onChange={v => { set("smokingPolicy", v); fwd(4); }} columns={2} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 4 && (
         <QuestionScreen title="Les chaussures dans le logement ?" visible={vis}>
           <BigButtonChoice options={SHOE_OPTIONS} value={data.shoesPolicy} onChange={v => { set("shoesPolicy", v); fwd(5); }} columns={2} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(5)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 5 && (
@@ -149,7 +137,6 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
           />
           <ContinueButton onClick={onNext} label="Étape suivante →" />
           <button type="button" onClick={onNext} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas d'autres règles →</button>
-          <QuestionNav onBack={bk} />
         </QuestionScreen>
       )}
     </>

@@ -1,6 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
-import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, BigTextInput, C } from "../WizardUI";
+import { useState } from "react";
+import { QuestionScreen, ContinueButton, BigButtonChoice, BigTextInput, C } from "../WizardUI";
 
 const TONE_OPTIONS = [
   "Hospitalier et convivial",
@@ -13,19 +13,13 @@ export default function StepPersonality({ data = {}, onChange, onNext, onBack, w
 
   const [q, setQ] = useState(0);
   const [vis, setVis] = useState(true);
-  const hist = useRef([]);
 
   function goTo(n) {
     setVis(false);
     setTimeout(() => { setQ(n); setVis(true); window.scrollTo({ top: 0, behavior: "instant" }); }, 400);
   }
-  function fwd(n) { hist.current = [...hist.current, q]; goTo(n); }
-  function bk() {
-    const p = hist.current[hist.current.length - 1];
-    if (p === undefined) onBack?.(); else { hist.current = hist.current.slice(0, -1); goTo(p); }
-  }
+  function fwd(n) { goTo(n); }
 
-  // Build contact options from wizardData (only contacts with a name)
   const namedContacts = wizardContacts.filter(c => c?.name?.trim());
   const contactOptions = namedContacts.map(c => {
     const role = c.roleOther || (c.role && c.role !== "Autre" ? c.role : null);
@@ -47,7 +41,6 @@ export default function StepPersonality({ data = {}, onChange, onNext, onBack, w
             columns={1}
             withOther
           />
-          <QuestionNav onBack={bk} onSkip={() => { set("tone", "Hospitalier et convivial"); fwd(1); }} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -76,7 +69,6 @@ export default function StepPersonality({ data = {}, onChange, onNext, onBack, w
               <ContinueButton onClick={onNext} label="Étape suivante →" />
             </div>
           )}
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
         </QuestionScreen>
       )}
     </>

@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, QuestionNav, C } from "../WizardUI";
+import { useRef, useState } from "react";
+import { QA, ButtonChoice, WizardSection, StepNav, C } from "../WizardUI";
 import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
 
 const REC_ICONS = {
@@ -16,10 +16,95 @@ const TRP_ICONS = {
   carRental: "🚗", bicycle: "🚲", other: "➕",
 };
 
+const inpStyle = {
+  padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.1)",
+  fontFamily: C.font, fontSize: 13, outline: "none", boxSizing: "border-box", width: "100%",
+};
+
+// Nominatim autocomplete for place names
+function NominatimPlaceInput({ value, onSelect, placeholder }) {
+  const [input, setInput] = useState(value || "");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef(null);
+
+  function fetchSuggestions(q) {
+    clearTimeout(debounceRef.current);
+    if (!q || q.length < 3) { setSuggestions([]); setShowDropdown(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=5&countrycodes=fr`;
+        const res = await fetch(url, { headers: { "User-Agent": "loft-ai-wizard" } });
+        const data = await res.json();
+        setSuggestions(data);
+        setShowDropdown(data.length > 0);
+      } catch {}
+    }, 300);
+  }
+
+  function handleSelect(item) {
+    const a = item.address || {};
+    const name = item.name || item.display_name.split(",")[0];
+    const street = [a.house_number, a.road].filter(Boolean).join(" ");
+    const city = a.city || a.town || a.village || a.municipality || "";
+    const shortAddr = [street, city].filter(Boolean).join(", ");
+    setInput(name);
+    setSuggestions([]);
+    setShowDropdown(false);
+    onSelect(name, shortAddr);
+  }
+
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        value={input}
+        onChange={e => { setInput(e.target.value); onSelect(e.target.value, ""); fetchSuggestions(e.target.value); }}
+        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+        onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
+        placeholder={placeholder}
+        style={inpStyle}
+        autoComplete="off"
+      />
+      {showDropdown && suggestions.length > 0 && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0, background: "#fff",
+          border: "1px solid rgba(0,0,0,0.1)", borderRadius: 10, zIndex: 100,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)", overflow: "hidden", marginTop: 4,
+        }}>
+          {suggestions.map((s, i) => {
+            const a = s.address || {};
+            const name = s.name || s.display_name.split(",")[0];
+            const street = [a.house_number, a.road].filter(Boolean).join(" ");
+            const city = a.city || a.town || a.village || a.municipality || "";
+            const shortAddr = [street, city].filter(Boolean).join(", ");
+            return (
+              <button
+                key={i}
+                type="button"
+                onMouseDown={() => handleSelect(s)}
+                style={{
+                  display: "block", width: "100%", padding: "10px 14px", textAlign: "left",
+                  background: "none", border: "none",
+                  borderBottom: i < suggestions.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                  cursor: "pointer", fontFamily: C.font, fontSize: 13, color: "#1A1A1A", lineHeight: 1.4,
+                }}
+              >
+                <span style={{ color: C.green, fontWeight: 500 }}>📍 {name}</span>
+                {shortAddr && <span style={{ color: "#6B6B6B", fontSize: 12 }}> — {shortAddr}</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SimpleItemList({ items, onChange, addLabel, fields }) {
   const add = () => onChange([...items, {}]);
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
   const update = (i, k, v) => onChange(items.map((item, idx) => idx === i ? { ...item, [k]: v } : item));
+  const updateMultiple = (i, updates) => onChange(items.map((item, idx) => idx === i ? { ...item, ...updates } : item));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -38,17 +123,20 @@ function SimpleItemList({ items, onChange, addLabel, fields }) {
               color: "#E53E3E", cursor: "pointer", fontSize: 13,
             }}
           >✕</button>
-          {fields.map(f => (
+          {fields.map(f => f.type === "nominatim" ? (
+            <NominatimPlaceInput
+              key={f.id}
+              value={item[f.id] || ""}
+              onSelect={(name, address) => updateMultiple(i, { [f.id]: name, address })}
+              placeholder={f.placeholder}
+            />
+          ) : (
             <input
               key={f.id}
               value={item[f.id] || ""}
               onChange={e => update(i, f.id, e.target.value)}
               placeholder={f.placeholder}
-              style={{
-                padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.1)",
-                fontFamily: C.font, fontSize: 13, outline: "none", boxSizing: "border-box",
-                width: "100%",
-              }}
+              style={inpStyle}
             />
           ))}
         </div>
@@ -151,7 +239,7 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onBack, onS
               itemsKey="places"
               addLabel="+ Ajouter une adresse"
               itemFields={[
-                { id: "name",           placeholder: "Nom du lieu" },
+                { id: "name",           type: "nominatim", placeholder: "Nom du lieu" },
                 { id: "whyWeRecommend", placeholder: "Ce qu'on y aime..." },
               ]}
             />
@@ -177,7 +265,7 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onBack, onS
               itemsKey="activities"
               addLabel="+ Ajouter une activité"
               itemFields={[
-                { id: "name",        placeholder: "Nom de l'activité" },
+                { id: "name",        type: "nominatim", placeholder: "Nom de l'activité" },
                 { id: "description", placeholder: "En quelques mots..." },
               ]}
             />
@@ -212,7 +300,6 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onBack, onS
       </QA>
 
       <StepNav onNext={onNext} nextLabel="Étape suivante →" />
-      <QuestionNav onBack={onBack} onSkip={onSkip || onNext} skipLabel="Passer" />
     </WizardSection>
   );
 }
