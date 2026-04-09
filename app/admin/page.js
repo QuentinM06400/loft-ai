@@ -463,7 +463,20 @@ function Dashboard({ password, initialTab, onLogout, onRestartWizard }) {
       {/* Content */}
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "24px 20px" }}>
         {activeTab === "conversations" && <ConversationsTab password={password} />}
-        {activeTab === "content" && <ContentTab password={password} />}
+        {activeTab === "content" && (
+          <div style={{
+            textAlign: "center", padding: "60px 20px",
+            color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif",
+          }}>
+            <div style={{ fontSize: 32, marginBottom: 16 }}>🚧</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "#1A1A1A", marginBottom: 8 }}>
+              Disponible prochainement
+            </div>
+            <div style={{ fontSize: 13 }}>
+              L'onglet Contenu sera bientôt disponible.
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -479,10 +492,11 @@ export default function AdminPage() {
   const checkOnboarding = useCallback(async (pwd) => {
     try {
       const res = await fetch("/api/content", { headers: { "x-admin-password": pwd } });
+      if (!res.ok) { setNeedsOnboarding(true); return; }
       const data = await res.json();
       setNeedsOnboarding(!data.propertyData);
     } catch {
-      setNeedsOnboarding(false); // network error → go straight to dashboard
+      setNeedsOnboarding(true); // réseau ou Redis non configuré → afficher le wizard
     }
   }, []);
 
