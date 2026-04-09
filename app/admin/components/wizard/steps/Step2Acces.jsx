@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
-import { QuestionScreen, ContinueButton, BigButtonChoice, MultiButtonChoice, BigTextInput, BigTextarea, ChipChecklist, InfoNote, C } from "../WizardUI";
+import { useRef, useState } from "react";
+import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, MultiButtonChoice, BigTextInput, BigTextarea, ChipChecklist, InfoNote, C } from "../WizardUI";
 
 const CHECKIN_TIMES  = ["14:00", "15:00", "16:00", "Flexible", "Flexible sur demande"];
 const CHECKOUT_TIMES = ["10:00", "11:00", "12:00", "Flexible", "Flexible sur demande"];
 const ACCESS_MODES   = ["Accueil en personne", "Boîte à clés", "Serrure connectée", "Digicode"];
-const WHO_WELCOMES   = ["Le propriétaire", "Un co-hôte", "Une personne de confiance", "Une agence / conciergerie"];
+const WHO_WELCOMES   = ["Vous-même", "Co-hôte", "Gestionnaire", "Conciergerie"];
 const DEPARTURE_SUGGESTIONS = [
   "Fermer les fenêtres", "Éteindre les lumières et la climatisation",
   "Sortir les poubelles", "Laisser les clés sur la table", "Tirer la porte à clé",
@@ -36,8 +36,7 @@ function MultiTimeChoice({ options, values = [], otherValue = "", onValuesChange
             <button key={t} type="button" onClick={() => toggle(t)} style={{
               minHeight: 52, padding: "12px 24px", borderRadius: 14,
               border: sel ? `2px solid ${C.green}` : "2px solid rgba(0,0,0,0.1)",
-              background: sel ? C.green : "#fff",
-              color: sel ? "#fff" : "#1A1A1A",
+              background: sel ? C.green : "#fff", color: sel ? "#fff" : "#1A1A1A",
               fontSize: 16, fontWeight: sel ? 700 : 400,
               cursor: "pointer", fontFamily: C.font, transition: "all .15s",
               boxShadow: sel ? "0 3px 12px rgba(42,107,90,0.25)" : "none",
@@ -74,15 +73,19 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
 
   const [q, setQ] = useState(0);
   const [vis, setVis] = useState(true);
+  const hist = useRef([]);
 
   function goTo(n) {
     setVis(false);
     setTimeout(() => { setQ(n); setVis(true); window.scrollTo({ top: 0, behavior: "instant" }); }, 400);
   }
-  function fwd(n) { goTo(n); }
+  function fwd(n) { hist.current = [...hist.current, q]; goTo(n); }
+  function bk() {
+    const p = hist.current[hist.current.length - 1];
+    if (p === undefined) { onBack?.(); } else { hist.current = hist.current.slice(0, -1); goTo(p); }
+  }
 
   const accessModes = data.accessModes || [];
-
   const checkinTimes = data.checkinTimes || (data.checkinTime ? [data.checkinTime] : []);
   const checkoutTimes = data.checkoutTimes || (data.checkoutTime ? [data.checkoutTime] : []);
 
@@ -112,6 +115,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(1)} />
           </div>
+          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -129,6 +133,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(2)} />
           </div>
+          <QuestionNav onBack={bk} onSkip={() => fwd(2)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 2 && (
@@ -144,8 +149,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
                   }} style={{
                     minHeight: 52, padding: "12px 16px", borderRadius: 14,
                     border: sel ? `2px solid ${C.green}` : "2px solid rgba(0,0,0,0.1)",
-                    background: sel ? C.green : "#fff",
-                    color: sel ? "#fff" : "#1A1A1A",
+                    background: sel ? C.green : "#fff", color: sel ? "#fff" : "#1A1A1A",
                     fontSize: 14, fontWeight: sel ? 600 : 400,
                     cursor: "pointer", fontFamily: C.font, transition: "all .15s",
                   }}>{sel ? "✓ " : ""}{mode}</button>
@@ -177,8 +181,9 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
                 autoFocus
               />
             )}
-            <ContinueButton onClick={() => fwd(accessModes.includes("Accueil en personne") ? 3 : 4)} disabled={accessModes.length === 0} />
+            <ContinueButton onClick={() => fwd(3)} disabled={accessModes.length === 0} />
           </div>
+          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 3 && (
@@ -193,6 +198,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(4)} />
           </div>
+          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {q === 4 && (
@@ -204,6 +210,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             <ContinueButton onClick={() => fwd(5)} label="Continuer →" />
             <button type="button" onClick={() => fwd(5)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas de code →</button>
           </div>
+          <QuestionNav onBack={bk} />
         </QuestionScreen>
       )}
       {q === 5 && (
@@ -214,6 +221,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
           <BigTextarea value={data.arrivalInstructions} onChange={v => set("arrivalInstructions", v)} rows={4} />
           <ContinueButton onClick={() => fwd(6)} />
           <button type="button" onClick={() => fwd(6)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas d'instructions particulières →</button>
+          <QuestionNav onBack={bk} />
         </QuestionScreen>
       )}
       {q === 6 && (
@@ -225,6 +233,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             placeholder="Ex : Vider le réfrigérateur..."
           />
           <ContinueButton onClick={onNext} label="Étape suivante →" />
+          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
         </QuestionScreen>
       )}
     </>

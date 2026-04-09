@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import { QuestionScreen, ContinueButton, BigButtonChoice, C } from "../WizardUI";
+import { QuestionScreen, QuestionNav, ContinueButton, BigButtonChoice, C } from "../WizardUI";
 import { APPLIANCE_CATEGORIES } from "@/app/lib/propertySchema";
 
 // Build wizard categories: merge kitchen+smallKitchen, add 3 new ones
@@ -346,6 +346,7 @@ export default function Step4Equipements({ data = {}, onChange, onNext, onBack, 
       {screen === "intro" && (
         <QuestionScreen title="Quels équipements sont disponibles dans votre logement ?" sub="Cochez ceux qui sont présents — vous pourrez ajouter les détails maintenant ou plus tard." visible={vis}>
           <ContinueButton onClick={() => fwd(0)} label="Commencer →" />
+          <QuestionNav onBack={screenHist.current.length > 0 ? bk : onBack} onSkip={() => fwd("summary")} skipLabel="Passer" />
         </QuestionScreen>
       )}
       {typeof screen === "number" && screen >= 0 && screen < WIZARD_CATS.length && (() => {
@@ -380,6 +381,7 @@ export default function Step4Equipements({ data = {}, onChange, onNext, onBack, 
           <QuestionScreen title={`${cat.icon} ${cat.label}`} visible={vis}>
             {content}
             <ContinueButton onClick={() => fwd(nextScreen)} />
+            <QuestionNav onBack={bk} onSkip={() => fwd(nextScreen)} skipLabel="Passer" />
           </QuestionScreen>
         );
       })()}
@@ -415,6 +417,7 @@ export default function Step4Equipements({ data = {}, onChange, onNext, onBack, 
             </div>
           )}
           <ContinueButton onClick={onNext} label="Étape suivante →" />
+          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
         </QuestionScreen>
       )}
     </>
