@@ -339,49 +339,49 @@ TAXI / VTC :
 `;
 
 const LANGUAGES = [
-  { code: "fr", flag: "\u{1F1EB}\u{1F1F7}", label: "Fran\u00e7ais" },
+  { code: "fr", flag: "\u{1F1EB}\u{1F1F7}", label: "Français" },
   { code: "en", flag: "\u{1F1EC}\u{1F1E7}", label: "English" },
-  { code: "es", flag: "\u{1F1EA}\u{1F1F8}", label: "Espa\u00f1ol" },
+  { code: "es", flag: "\u{1F1EA}\u{1F1F8}", label: "Español" },
   { code: "de", flag: "\u{1F1E9}\u{1F1EA}", label: "Deutsch" },
   { code: "it", flag: "\u{1F1EE}\u{1F1F9}", label: "Italiano" },
-  { code: "pt", flag: "\u{1F1F5}\u{1F1F9}", label: "Portugu\u00eas" },
+  { code: "pt", flag: "\u{1F1F5}\u{1F1F9}", label: "Português" },
   { code: "nl", flag: "\u{1F1F3}\u{1F1F1}", label: "Nederlands" },
-  { code: "ru", flag: "\u{1F1F7}\u{1F1FA}", label: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439" },
-  { code: "zh", flag: "\u{1F1E8}\u{1F1F3}", label: "\u4e2d\u6587" },
-  { code: "ja", flag: "\u{1F1EF}\u{1F1F5}", label: "\u65e5\u672c\u8a9e" },
-  { code: "ar", flag: "\u{1F1F8}\u{1F1E6}", label: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629" },
-  { code: "ko", flag: "\u{1F1F0}\u{1F1F7}", label: "\ud55c\uad6d\uc5b4" },
+  { code: "ru", flag: "\u{1F1F7}\u{1F1FA}", label: "Русский" },
+  { code: "zh", flag: "\u{1F1E8}\u{1F1F3}", label: "中文" },
+  { code: "ja", flag: "\u{1F1EF}\u{1F1F5}", label: "日本語" },
+  { code: "ar", flag: "\u{1F1F8}\u{1F1E6}", label: "العربية" },
+  { code: "ko", flag: "\u{1F1F0}\u{1F1F7}", label: "한국어" },
 ];
 
 const WELCOME_MESSAGES = {
-  fr: "Bienvenue dans votre loft \u00e0 Cannes ! \u2728\n\nJe suis **LOFT AI**, votre assistant virtuel propuls\u00e9 par intelligence artificielle, pour un s\u00e9jour parfait.\n\nPosez-moi toutes vos questions : fonctionnement de l'appartement, bonnes adresses, activit\u00e9s, transports... Je suis disponible 24h/24.\n\nComment puis-je vous aider ?",
-  en: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?",
-  es: "\u00a1Bienvenido a su loft en Cannes! \u2728\n\nSoy **LOFT AI**, su asistente virtual impulsado por inteligencia artificial, para una estancia perfecta.\n\nPreg\u00fanteme lo que quiera: funcionamiento del apartamento, mejores direcciones, actividades, transporte... Estoy disponible 24/7.\n\n\u00bfC\u00f3mo puedo ayudarle?",
-  de: "Willkommen in Ihrem Loft in Cannes! \u2728\n\nIch bin **LOFT AI**, Ihr KI-gest\u00fctzter virtueller Assistent f\u00fcr einen perfekten Aufenthalt.\n\nFragen Sie mich alles: Wohnungsfunktionen, beste Adressen, Aktivit\u00e4ten, Transport... Ich bin rund um die Uhr verf\u00fcgbar.\n\nWie kann ich Ihnen helfen?",
-  it: "Benvenuti nel vostro loft a Cannes! \u2728\n\nSono **LOFT AI**, il vostro assistente virtuale alimentato da intelligenza artificiale, per un soggiorno perfetto.\n\nChiedetemi tutto: funzionamento dell'appartamento, migliori indirizzi, attivit\u00e0, trasporti... Sono disponibile 24/7.\n\nCome posso aiutarvi?",
-  default: "Welcome to your loft in Cannes! \u2728\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?"
+  fr: "Bienvenue dans votre loft à Cannes ! ✨\n\nJe suis **LOFT AI**, votre assistant virtuel propulsé par intelligence artificielle, pour un séjour parfait.\n\nPosez-moi toutes vos questions : fonctionnement de l'appartement, bonnes adresses, activités, transports... Je suis disponible 24h/24.\n\nComment puis-je vous aider ?",
+  en: "Welcome to your loft in Cannes! ✨\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?",
+  es: "¡Bienvenido a su loft en Cannes! ✨\n\nSoy **LOFT AI**, su asistente virtual impulsado por inteligencia artificial, para una estancia perfecta.\n\nPregúnteme lo que quiera: funcionamiento del apartamento, mejores direcciones, actividades, transporte... Estoy disponible 24/7.\n\n¿Cómo puedo ayudarle?",
+  de: "Willkommen in Ihrem Loft in Cannes! ✨\n\nIch bin **LOFT AI**, Ihr KI-gestützter virtueller Assistent für einen perfekten Aufenthalt.\n\nFragen Sie mich alles: Wohnungsfunktionen, beste Adressen, Aktivitäten, Transport... Ich bin rund um die Uhr verfügbar.\n\nWie kann ich Ihnen helfen?",
+  it: "Benvenuti nel vostro loft a Cannes! ✨\n\nSono **LOFT AI**, il vostro assistente virtuale alimentato da intelligenza artificiale, per un soggiorno perfetto.\n\nChiedetemi tutto: funzionamento dell'appartamento, migliori indirizzi, attività, trasporti... Sono disponibile 24/7.\n\nCome posso aiutarvi?",
+  default: "Welcome to your loft in Cannes! ✨\n\nI'm **LOFT AI**, your AI-powered virtual assistant for a perfect stay.\n\nAsk me anything: how the apartment works, best local spots, activities, transport... I'm available 24/7.\n\nHow can I help you?"
 };
 
 const QUICK_LABELS = {
-  fr: { rules: "R\u00e8gles", wifi: "WiFi", tv: "TV", ac: "Clim", checkout: "Check-out", restos: "Restos", beaches: "Plages", activities: "Activit\u00e9s", transport: "Transports" },
+  fr: { rules: "Règles", wifi: "WiFi", tv: "TV", ac: "Clim", checkout: "Check-out", restos: "Restos", beaches: "Plages", activities: "Activités", transport: "Transports" },
   en: { rules: "Rules", wifi: "WiFi", tv: "TV", ac: "A/C", checkout: "Check-out", restos: "Restaurants", beaches: "Beaches", activities: "Activities", transport: "Transport" },
   es: { rules: "Reglas", wifi: "WiFi", tv: "TV", ac: "Aire acond.", checkout: "Check-out", restos: "Restaurantes", beaches: "Playas", activities: "Actividades", transport: "Transporte" },
-  de: { rules: "Regeln", wifi: "WiFi", tv: "TV", ac: "Klima", checkout: "Check-out", restos: "Restaurants", beaches: "Str\u00e4nde", activities: "Aktivit\u00e4ten", transport: "Transport" },
-  it: { rules: "Regole", wifi: "WiFi", tv: "TV", ac: "Clima", checkout: "Check-out", restos: "Ristoranti", beaches: "Spiagge", activities: "Attivit\u00e0", transport: "Trasporti" },
+  de: { rules: "Regeln", wifi: "WiFi", tv: "TV", ac: "Klima", checkout: "Check-out", restos: "Restaurants", beaches: "Strände", activities: "Aktivitäten", transport: "Transport" },
+  it: { rules: "Regole", wifi: "WiFi", tv: "TV", ac: "Clima", checkout: "Check-out", restos: "Ristoranti", beaches: "Spiagge", activities: "Attività", transport: "Trasporti" },
 };
 
 function getQuickActions(lang) {
   const l = QUICK_LABELS[lang] || QUICK_LABELS.en;
   return [
-    { icon: "\u{1F4CB}", label: l.rules, q: lang === "fr" ? "Quelles sont les r\u00e8gles de l'appartement ?" : "What are the apartment rules?" },
+    { icon: "\u{1F4CB}", label: l.rules, q: lang === "fr" ? "Quelles sont les règles de l'appartement ?" : "What are the apartment rules?" },
     { icon: "\u{1F4F6}", label: l.wifi, q: lang === "fr" ? "Quel est le code WiFi ?" : "What is the WiFi password?" },
-    { icon: "\u{1F4FA}", label: l.tv, q: lang === "fr" ? "Comment allumer et utiliser la t\u00e9l\u00e9 ?" : "How do I use the TV?" },
-    { icon: "\u2744\uFE0F", label: l.ac, q: lang === "fr" ? "Comment utiliser la climatisation ?" : "How do I use the air conditioning?" },
-    { icon: "\u{1F5DD}\uFE0F", label: l.checkout, q: lang === "fr" ? "Quelles sont les instructions de check-out ?" : "What are the check-out instructions?" },
-    { icon: "\u{1F37D}\uFE0F", label: l.restos, q: lang === "fr" ? "Quels restaurants me recommandes-tu ?" : "What restaurants do you recommend?" },
-    { icon: "\u{1F3D6}\uFE0F", label: l.beaches, q: lang === "fr" ? "Quelles plages me recommandes-tu ?" : "Which beaches do you recommend?" },
-    { icon: "\u{1F9ED}", label: l.activities, q: lang === "fr" ? "Que faire \u00e0 Cannes et aux alentours ?" : "What is there to do in and around Cannes?" },
-    { icon: "\u{1F68C}", label: l.transport, q: lang === "fr" ? "Comment se d\u00e9placer \u00e0 Cannes ?" : "How do I get around Cannes?" },
+    { icon: "\u{1F4FA}", label: l.tv, q: lang === "fr" ? "Comment allumer et utiliser la télé ?" : "How do I use the TV?" },
+    { icon: "❄️", label: l.ac, q: lang === "fr" ? "Comment utiliser la climatisation ?" : "How do I use the air conditioning?" },
+    { icon: "\u{1F5DD}️", label: l.checkout, q: lang === "fr" ? "Quelles sont les instructions de check-out ?" : "What are the check-out instructions?" },
+    { icon: "\u{1F37D}️", label: l.restos, q: lang === "fr" ? "Quels restaurants me recommandes-tu ?" : "What restaurants do you recommend?" },
+    { icon: "\u{1F3D6}️", label: l.beaches, q: lang === "fr" ? "Quelles plages me recommandes-tu ?" : "Which beaches do you recommend?" },
+    { icon: "\u{1F9ED}", label: l.activities, q: lang === "fr" ? "Que faire à Cannes et aux alentours ?" : "What is there to do in and around Cannes?" },
+    { icon: "\u{1F68C}", label: l.transport, q: lang === "fr" ? "Comment se déplacer à Cannes ?" : "How do I get around Cannes?" },
   ];
 }
 
@@ -391,17 +391,17 @@ const PHONE_NUMBER = "tel:+33621858804";
 const CONSENT_TEXTS = {
   fr: {
     title: "Bienvenue sur LOFT AI",
-    subtitle: "Votre concierge virtuel propuls\u00e9 par intelligence artificielle",
+    subtitle: "Votre concierge virtuel propulsé par intelligence artificielle",
     body: "En utilisant LOFT AI, vous acceptez que :",
     points: [
-      "Vous interagissez avec une intelligence artificielle, et non un \u00eatre humain",
-      "Vos conversations sont enregistr\u00e9es pour am\u00e9liorer le service (dur\u00e9e : 90 jours max)",
-      "Aucune donn\u00e9e personnelle n'est partag\u00e9e avec des tiers"
+      "Vous interagissez avec une intelligence artificielle, et non un être humain",
+      "Vos conversations sont enregistrées pour améliorer le service (durée : 90 jours max)",
+      "Aucune donnée personnelle n'est partagée avec des tiers"
     ],
-    privacy: "Politique de confidentialit\u00e9",
+    privacy: "Politique de confidentialité",
     accept: "J'accepte et je continue",
     refuse: "Je refuse",
-    refuseMsg: "Vous pouvez toujours contacter Quentin directement par WhatsApp ou t\u00e9l\u00e9phone."
+    refuseMsg: "Vous pouvez toujours contacter Quentin directement par WhatsApp ou téléphone."
   },
   en: {
     title: "Welcome to LOFT AI",
@@ -460,7 +460,7 @@ function ConsentPopup({ lang, onAccept, onRefuse }) {
         <div style={{ marginBottom: 16 }}>
           {t.points.map((point, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
-              <span style={{ color: "var(--accent)", flexShrink: 0 }}>{"\u2713"}</span>
+              <span style={{ color: "var(--accent)", flexShrink: 0 }}>{"✓"}</span>
               <span>{point}</span>
             </div>
           ))}
@@ -510,7 +510,7 @@ function RefusedScreen({ lang }) {
       <button onClick={() => window.location.reload()} style={{
         marginTop: 20, background: "none", border: "none", color: "var(--accent)",
         cursor: "pointer", fontSize: 13, fontFamily: "inherit", textDecoration: "underline"
-      }}>{"\u2190"} Revenir</button>
+      }}>{"←"} Revenir</button>
     </div>
   );
 }
@@ -581,7 +581,7 @@ function LanguageSelector({ onSelect }) {
 
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4, letterSpacing: "-0.5px" }}>LOFT AI</h1>
       <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 28, textAlign: "center" }}>
-        Choose your language {"\u00B7"} Choisissez votre langue
+        Choose your language {"·"} Choisissez votre langue
       </p>
 
       {!showOther ? (
@@ -620,7 +620,7 @@ function LanguageSelector({ onSelect }) {
       ) : (
         <div style={{ width: "100%", maxWidth: 340, animation: "scaleIn .3s ease" }}>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 10, textAlign: "center" }}>
-            {"Type your language / \u00c9crivez votre langue"}
+            {"Type your language / Écrivez votre langue"}
           </p>
           <div style={{ display: "flex", gap: 8 }}>
             <input
@@ -643,7 +643,7 @@ function LanguageSelector({ onSelect }) {
           <button onClick={() => setShowOther(false)} style={{
             marginTop: 10, background: "none", border: "none", color: "var(--text-secondary)",
             cursor: "pointer", fontSize: 13, fontFamily: "inherit", width: "100%", textAlign: "center"
-          }}>{"\u2190 Back to languages"}</button>
+          }}>{"← Back to languages"}</button>
         </div>
       )}
     </div>
@@ -783,7 +783,7 @@ export default function LoftAI() {
       });
       const data = await response.json();
       const reply = data.content?.[0]?.text || (lang === "fr"
-        ? "D\u00e9sol\u00e9, je n'ai pas pu traiter votre demande. Contactez Quentin au 06 21 85 88 04."
+        ? "Désolé, je n'ai pas pu traiter votre demande. Contactez Quentin au 06 21 85 88 04."
         : "Sorry, I couldn't process your request. Contact Quentin at +33 6 21 85 88 04.");
       const assistantMsg = { role: "assistant", content: reply };
       setMessages(prev => [...prev, assistantMsg]);
@@ -856,7 +856,7 @@ export default function LoftAI() {
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: 15, color: "var(--text-primary)", letterSpacing: "-0.3px" }}>LOFT AI</div>
-          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 1 }}>Cannes {"\u00B7"} {langLabel}</div>
+          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 1 }}>Cannes {"·"} {langLabel}</div>
         </div>
 
         <a href={"https://wa.me/" + WHATSAPP_NUMBER} target="_blank" rel="noopener noreferrer" style={{
@@ -953,7 +953,7 @@ export default function LoftAI() {
           </button>
         </div>
         <p style={{ textAlign: "center", color: "var(--text-secondary)", fontSize: 10, margin: "8px 0 0", opacity: 0.5 }}>
-          Assistant IA {"\u00B7"} <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>Confidentialit\u00e9</a> {"\u00B7"} LOFT AI Cannes
+          Assistant IA {"·"} <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>Confidentialité</a> {"·"} LOFT AI Cannes
         </p>
       </div>
     </div>

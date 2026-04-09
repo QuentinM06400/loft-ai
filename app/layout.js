@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "LOFT AI - Concierge Virtuel | Cannes",
-  description: "Votre assistant virtuel intelligent pour un s\u00e9jour parfait dans notre loft design \u00e0 Cannes, C\u00f4te d'Azur.",
+  description: "Votre assistant virtuel intelligent pour un séjour parfait dans notre loft design à Cannes, Côte d'Azur.",
 };
 
 export default function RootLayout({ children }) {

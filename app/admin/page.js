@@ -1,5 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { t } from "@/app/lib/i18n";
+import ContentTab from "@/app/admin/components/ContentTab";
+import WizardContainer from "@/app/admin/components/wizard/WizardContainer";
 
 const LANG_FLAGS = {
   fr: "\u{1F1EB}\u{1F1F7}", en: "\u{1F1EC}\u{1F1E7}", es: "\u{1F1EA}\u{1F1F8}",
@@ -40,8 +43,8 @@ function LoginScreen({ onLogin }) {
             fontSize: 22, color: "#fff", fontWeight: 800, marginBottom: 12,
             boxShadow: "0 4px 16px rgba(42,107,90,0.3)"
           }}>L</div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1A1A1A", margin: "0 0 4px" }}>LOFT AI Admin</h1>
-          <p style={{ fontSize: 13, color: "#6B6B6B", margin: 0 }}>Espace de gestion</p>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: "#1A1A1A", margin: "0 0 4px" }}>{t("admin.title")}</h1>
+          <p style={{ fontSize: 13, color: "#6B6B6B", margin: 0 }}>{t("admin.subtitle")}</p>
         </div>
         <div>
           <input
@@ -49,7 +52,7 @@ function LoginScreen({ onLogin }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter") handleSubmit(e); }}
-            placeholder="Mot de passe"
+            placeholder={t("admin.login.passwordPlaceholder")}
             autoFocus
             style={{
               width: "100%", padding: "14px 16px", borderRadius: 12, fontSize: 14,
@@ -58,14 +61,14 @@ function LoginScreen({ onLogin }) {
               boxSizing: "border-box", transition: "border .2s"
             }}
           />
-          {error && <p style={{ color: "#E53E3E", fontSize: 12, marginTop: 6 }}>Mot de passe incorrect</p>}
+          {error && <p style={{ color: "#E53E3E", fontSize: 12, marginTop: 6 }}>{t("admin.login.error")}</p>}
           <button onClick={handleSubmit} style={{
             width: "100%", padding: "14px", borderRadius: 12, border: "none",
             background: "#2A6B5A", color: "#fff", fontSize: 14, fontWeight: 600,
             cursor: "pointer", fontFamily: "inherit", marginTop: 12,
             boxShadow: "0 3px 12px rgba(42,107,90,0.3)", transition: "opacity .15s"
           }}>
-            Connexion
+            {t("admin.login.submit")}
           </button>
         </div>
       </div>
@@ -88,17 +91,17 @@ function StatsBar({ conversations }) {
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
       <div style={{ padding: "16px", borderRadius: 14, background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: 24, fontWeight: 700, color: "#2A6B5A" }}>{total}</div>
-        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>Conversations</div>
+        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>{t("admin.stats.conversations")}</div>
       </div>
       <div style={{ padding: "16px", borderRadius: 14, background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: 24, fontWeight: 700, color: "#2A6B5A" }}>{totalMessages}</div>
-        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>Messages guests</div>
+        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>{t("admin.stats.messages")}</div>
       </div>
       <div style={{ padding: "16px", borderRadius: 14, background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: 16, fontWeight: 600, color: "#2A6B5A" }}>
           {topLangs.map(([l]) => LANG_FLAGS[l] || "\u{1F30D}").join(" ")}
         </div>
-        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>Top langues</div>
+        <div style={{ fontSize: 12, color: "#6B6B6B", marginTop: 2 }}>{t("admin.stats.topLanguages")}</div>
       </div>
     </div>
   );
@@ -173,20 +176,20 @@ function ConversationCard({ conv, onDelete, onExpand, isExpanded }) {
                 padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500,
                 border: "1px solid #E53E3E", background: "transparent", color: "#E53E3E",
                 cursor: "pointer", fontFamily: "inherit"
-              }}>Supprimer</button>
+              }}>{t("admin.conversations.delete")}</button>
             ) : (
               <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                <span style={{ fontSize: 12, color: "#E53E3E" }}>Confirmer ?</span>
+                <span style={{ fontSize: 12, color: "#E53E3E" }}>{t("admin.conversations.confirmQuestion")}</span>
                 <button onClick={(e) => { e.stopPropagation(); onDelete(conv.id); }} style={{
                   padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600,
                   border: "none", background: "#E53E3E", color: "#fff",
                   cursor: "pointer", fontFamily: "inherit"
-                }}>Oui, supprimer</button>
+                }}>{t("admin.conversations.confirmYes")}</button>
                 <button onClick={(e) => { e.stopPropagation(); setConfirmDelete(false); }} style={{
                   padding: "7px 14px", borderRadius: 10, fontSize: 12,
                   border: "1px solid rgba(0,0,0,0.1)", background: "transparent", color: "#6B6B6B",
                   cursor: "pointer", fontFamily: "inherit"
-                }}>Annuler</button>
+                }}>{t("admin.conversations.cancel")}</button>
               </div>
             )}
           </div>
@@ -266,7 +269,7 @@ function ConversationsTab({ password }) {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Rechercher dans les messages..."
+          placeholder={t("admin.conversations.searchPlaceholder")}
           style={{
             flex: "1 1 200px", padding: "10px 14px", borderRadius: 10, fontSize: 13,
             border: "1px solid rgba(0,0,0,0.08)", background: "#FAFAF8",
@@ -282,7 +285,7 @@ function ConversationsTab({ password }) {
             fontFamily: "inherit", outline: "none", cursor: "pointer"
           }}
         >
-          <option value="all">Toutes les langues</option>
+          <option value="all">{t("admin.conversations.allLanguages")}</option>
           {allLangs.map(l => (
             <option key={l} value={l}>{LANG_FLAGS[l] || "\u{1F30D}"} {l}</option>
           ))}
@@ -311,15 +314,15 @@ function ConversationsTab({ password }) {
 
       {/* Liste */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: 40, color: "#6B6B6B" }}>Chargement...</div>
+        <div style={{ textAlign: "center", padding: 40, color: "#6B6B6B" }}>{t("admin.conversations.loading")}</div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: "#6B6B6B" }}>
-          {conversations.length === 0 ? "Aucune conversation enregistr\u00e9e pour le moment" : "Aucune conversation ne correspond aux filtres"}
+          {conversations.length === 0 ? t("admin.conversations.empty") : t("admin.conversations.noMatch")}
         </div>
       ) : (
         <div>
           <div style={{ fontSize: 12, color: "#6B6B6B", marginBottom: 10 }}>
-            {filtered.length} conversation{filtered.length > 1 ? "s" : ""}{filtered.length !== conversations.length ? ` (sur ${conversations.length})` : ""}
+            {filtered.length} {filtered.length > 1 ? t("admin.conversations.countPlural") : t("admin.conversations.countSingle")}{filtered.length !== conversations.length ? ` (${t("admin.conversations.countOf")} ${conversations.length})` : ""}
           </div>
           {filtered.map(conv => (
             <ConversationCard
@@ -336,17 +339,79 @@ function ConversationsTab({ password }) {
   );
 }
 
-export default function AdminPage() {
-  const [password, setPassword] = useState(null);
-  const [activeTab, setActiveTab] = useState("conversations");
 
-  if (!password) return <LoginScreen onLogin={setPassword} />;
+
+function ResetDataButton({ password, onReset }) {
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  // Only visible on localhost
+  if (typeof window !== "undefined" && !["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    return null;
+  }
+
+  async function handleReset() {
+    setBusy(true);
+    try {
+      await fetch("/api/content", {
+        method: "DELETE",
+        headers: { "x-admin-password": password },
+      });
+      setConfirming(false);
+      onReset();
+    } catch {
+      // silently ignore
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 8 }}>
+        <span style={{ fontSize: 12, color: "#E53E3E" }}>Supprimer property:default ?</span>
+        <button
+          onClick={handleReset}
+          disabled={busy}
+          style={{
+            padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+            border: "none", background: "#E53E3E", color: "#fff",
+            cursor: busy ? "default" : "pointer", fontFamily: "inherit",
+          }}
+        >{busy ? "..." : "Oui, réinitialiser"}</button>
+        <button
+          onClick={() => setConfirming(false)}
+          style={{
+            padding: "6px 10px", borderRadius: 8, fontSize: 12,
+            border: "1px solid rgba(0,0,0,0.1)", background: "transparent",
+            color: "#6B6B6B", cursor: "pointer", fontFamily: "inherit",
+          }}
+        >Annuler</button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#FAFAF8",
-      fontFamily: "'DM Sans', sans-serif"
-    }}>
+    <button
+      onClick={() => setConfirming(true)}
+      title="Dev only — supprime property:default dans Redis"
+      style={{
+        padding: "8px 12px", borderRadius: 10, fontSize: 11, fontWeight: 500,
+        border: "1px solid rgba(229,62,62,0.3)", background: "rgba(229,62,62,0.05)",
+        color: "#C53030", cursor: "pointer", fontFamily: "inherit", marginRight: 8,
+        opacity: 0.7,
+      }}
+      onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+      onMouseLeave={e => e.currentTarget.style.opacity = "0.7"}
+    >🗑 Réinitialiser</button>
+  );
+}
+
+function Dashboard({ password, initialTab, onLogout, onRestartWizard }) {
+  const [activeTab, setActiveTab] = useState(initialTab || "conversations");
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#FAFAF8", fontFamily: "'DM Sans', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* Header */}
@@ -361,20 +426,29 @@ export default function AdminPage() {
         }}>L</div>
         <div style={{ flex: 1 }}>
           <span style={{ fontWeight: 700, fontSize: 16, color: "#1A1A1A" }}>LOFT AI</span>
-          <span style={{ fontSize: 13, color: "#6B6B6B", marginLeft: 8 }}>Admin</span>
+          <span style={{ fontSize: 13, color: "#6B6B6B", marginLeft: 8 }}>{t("admin.headerLabel")}</span>
         </div>
-        <button onClick={() => setPassword(null)} style={{
+        <button
+          onClick={onRestartWizard}
+          style={{
+            padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500,
+            border: "1px solid rgba(42,107,90,0.3)", background: "rgba(42,107,90,0.05)",
+            color: "#2A6B5A", cursor: "pointer", fontFamily: "inherit", marginRight: 8,
+          }}
+        >🧭 Assistant de configuration</button>
+        <ResetDataButton password={password} onReset={onRestartWizard} />
+        <button onClick={onLogout} style={{
           padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 500,
           border: "1px solid rgba(0,0,0,0.1)", background: "transparent",
           color: "#6B6B6B", cursor: "pointer", fontFamily: "inherit"
-        }}>D\u00e9connexion</button>
+        }}>{t("admin.logout")}</button>
       </div>
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 0, padding: "0 24px", background: "#fff", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
         {[
-          { id: "conversations", label: "Conversations", icon: "\u{1F4AC}" },
-          { id: "content", label: "Contenu", icon: "\u{1F4DD}" },
+          { id: "conversations", label: t("admin.tabs.conversations"), icon: "\u{1F4AC}" },
+          { id: "content", label: t("admin.tabs.content"), icon: "\u{1F4DD}" },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
             padding: "14px 20px", fontSize: 13, fontWeight: activeTab === tab.id ? 600 : 400,
@@ -389,17 +463,71 @@ export default function AdminPage() {
       {/* Content */}
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "24px 20px" }}>
         {activeTab === "conversations" && <ConversationsTab password={password} />}
-        {activeTab === "content" && (
-          <div style={{
-            textAlign: "center", padding: 60, color: "#6B6B6B",
-            background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
-          }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>{"\u{1F6A7}"}</div>
-            <p style={{ fontSize: 14 }}>L'onglet Contenu sera disponible prochainement.</p>
-            <p style={{ fontSize: 12, marginTop: 4 }}>Modification du WiFi, des recommandations, etc.</p>
-          </div>
-        )}
+        {activeTab === "content" && <ContentTab password={password} />}
       </div>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  const [password, setPassword] = useState(null);
+  // null = checking, true = show wizard, false = show dashboard
+  const [needsOnboarding, setNeedsOnboarding] = useState(null);
+  const [initialTab, setInitialTab] = useState("conversations");
+
+  // After login, check whether property:default exists in Redis
+  const checkOnboarding = useCallback(async (pwd) => {
+    try {
+      const res = await fetch("/api/content", { headers: { "x-admin-password": pwd } });
+      const data = await res.json();
+      setNeedsOnboarding(!data.propertyData);
+    } catch {
+      setNeedsOnboarding(false); // network error → go straight to dashboard
+    }
+  }, []);
+
+  function handleLogin(pwd) {
+    setPassword(pwd);
+    checkOnboarding(pwd);
+  }
+
+  // Called when the wizard finishes (activate or skip)
+  function handleWizardFinish(savedData, goToSection) {
+    setNeedsOnboarding(false);
+    if (goToSection) setInitialTab("content");
+  }
+
+  if (!password) return <LoginScreen onLogin={handleLogin} />;
+
+  // Checking Redis…
+  if (needsOnboarding === null) {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+        background: "#FAFAF8", fontFamily: "'DM Sans', sans-serif",
+      }}>
+        <div style={{ fontSize: 13, color: "#6B6B6B" }}>Chargement...</div>
+      </div>
+    );
+  }
+
+  // Show wizard for first-time setup
+  if (needsOnboarding) {
+    return (
+      <WizardContainer
+        password={password}
+        onFinish={handleWizardFinish}
+      />
+    );
+  }
+
+  // Normal dashboard
+  return (
+    <Dashboard
+      password={password}
+      initialTab={initialTab}
+      onLogout={() => { setPassword(null); setNeedsOnboarding(null); }}
+      onRestartWizard={() => setNeedsOnboarding(true)}
+    />
   );
 }
