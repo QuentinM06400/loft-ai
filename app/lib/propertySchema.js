@@ -52,6 +52,27 @@ export const APPLIANCE_CATEGORIES = [
     { id: 'hairDryer',    label: 'Sèche-cheveux' },
     { id: 'towelWarmer',  label: 'Sèche-serviettes' },
   ]},
+  { id: 'lighting',     label: 'Lumières, fenêtres & volets', items: [
+    { id: 'shutters',     label: 'Volets' },
+    { id: 'blinds',       label: 'Stores' },
+    { id: 'skylights',    label: 'Velux / Fenêtres de toit' },
+    { id: 'smartLights',  label: 'Lumières connectées' },
+    { id: 'dimmer',       label: 'Variateur de lumière' },
+  ]},
+  { id: 'tv',           label: 'TV & Multimédia', items: [
+    { id: 'television',   label: 'Télévision' },
+    { id: 'tvBox',        label: 'Box TV / Décodeur' },
+    { id: 'homeCinema',   label: 'Home cinéma' },
+    { id: 'streaming',    label: 'Streaming (Netflix, Disney+...)' },
+    { id: 'remoteControl',label: 'Télécommande universelle' },
+  ]},
+  { id: 'storage',      label: 'Rangements & Consommables', items: [
+    { id: 'linens',       label: 'Linge de maison' },
+    { id: 'cleaningProducts', label: 'Produits ménagers' },
+    { id: 'towels',       label: 'Serviettes' },
+    { id: 'closets',      label: 'Placards / Rangements' },
+    { id: 'pantry',       label: 'Placard cuisine' },
+  ]},
 ];
 
 // ─── Recommendation / Activity / Transport categories ─────────────────────────
@@ -62,6 +83,7 @@ export const RECOMMENDATION_CATEGORIES = [
   { id: 'beaches',      label: 'Plages' },
   { id: 'shopping',     label: 'Shopping' },
   { id: 'markets',      label: 'Marchés' },
+  { id: 'commerces',    label: 'Commerces' },
   { id: 'nightlife',    label: 'Vie nocturne' },
   { id: 'other',        label: 'Autres adresses' },
 ];

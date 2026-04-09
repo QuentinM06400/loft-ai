@@ -196,7 +196,7 @@ export function MultiButtonChoice({ options, value = [], onChange, columns = 2, 
         })}
         {withOther && (
           <button type="button" onClick={() => {
-            if (!hasOther) { setOtherVal(""); } else {
+            if (!hasOther) { onChange([...value, "__autre__"]); } else {
               onChange(value.filter(v => options.includes(v)));
             }
           }} style={{

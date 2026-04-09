@@ -1,25 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
 import { WizardStyles, C } from "./WizardUI";
-import WizardWelcome   from "./WizardWelcome";
-import Step1Logement   from "./steps/Step1Logement";
-import Step2Acces      from "./steps/Step2Acces";
-import Step3Regles     from "./steps/Step3Regles";
-import Step4Equipements from "./steps/Step4Equipements";
-import Step5Quartier   from "./steps/Step5Quartier";
-import Step6Contacts   from "./steps/Step6Contacts";
+import WizardWelcome      from "./WizardWelcome";
+import Step1Logement      from "./steps/Step1Logement";
+import Step2Acces         from "./steps/Step2Acces";
+import Step3Regles        from "./steps/Step3Regles";
+import Step4Equipements   from "./steps/Step4Equipements";
+import Step5Quartier      from "./steps/Step5Quartier";
+import Step6Contacts      from "./steps/Step6Contacts";
+import StepPersonality    from "./steps/StepPersonality";
 import Step7Recapitulatif from "./steps/Step7Recapitulatif";
 
 const STORAGE_KEY = "loftai_wizard_v1";
 
 const STEPS = [
-  { id: "logement",    label: "Logement",    short: "1" },
-  { id: "acces",       label: "Accès",       short: "2" },
-  { id: "regles",      label: "Règles",      short: "3" },
-  { id: "equipements", label: "Équipements", short: "4" },
-  { id: "quartier",    label: "Quartier",    short: "5" },
-  { id: "contacts",    label: "Contacts",    short: "6" },
-  { id: "recap",       label: "Récap",       short: "7" },
+  { id: "logement",    label: "Logement",      short: "1" },
+  { id: "acces",       label: "Accès",         short: "2" },
+  { id: "regles",      label: "Règles",        short: "3" },
+  { id: "equipements", label: "Équipements",   short: "4" },
+  { id: "quartier",    label: "Quartier",      short: "5" },
+  { id: "contacts",    label: "Contacts",      short: "6" },
+  { id: "personality", label: "Personnalité",  short: "7" },
+  { id: "recap",       label: "Récap",         short: "8" },
 ];
 
 const STEP_TITLES = [
@@ -29,6 +31,7 @@ const STEP_TITLES = [
   { title: "Les équipements",    sub: "Quels appareils sont disponibles ?" },
   { title: "Votre quartier",     sub: "Ce qu'il y a à faire et à voir autour de chez vous" },
   { title: "Contacts & WiFi",    sub: "Qui contacter en cas de besoin ?" },
+  { title: "Personnalité",       sub: "Personnalisez le ton de votre concierge" },
   { title: "Récapitulatif",      sub: "Vérifiez et activez votre concierge" },
 ];
 
@@ -41,12 +44,12 @@ function ProgressBar({ step }) {
     }}>
       <div style={{ maxWidth: 620, margin: "0 auto" }}>
         <div style={{ fontSize: 13, color: "#6B6B6B", fontWeight: 500, marginBottom: 8 }}>
-          Étape {step + 1}/7 — <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{STEP_TITLES[step]?.title}</span>
+          Étape {step + 1}/8 — <span style={{ color: "#1A1A1A", fontWeight: 600 }}>{STEP_TITLES[step]?.title}</span>
         </div>
         <div style={{ height: 4, borderRadius: 4, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 4, background: C.green,
-            width: `${(step / 6) * 100}%`,
+            width: `${(step / 7) * 100}%`,
             transition: "width .4s ease",
           }} />
         </div>
@@ -61,7 +64,6 @@ export default function WizardContainer({ password, onFinish }) {
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState({});
   const [saving, setSaving] = useState(false);
-  const [animDir, setAnimDir] = useState("forward");
 
   // Restore from sessionStorage
   useEffect(() => {
@@ -86,24 +88,19 @@ export default function WizardContainer({ password, onFinish }) {
   }, [step, wizardData, showWelcome]);
 
   const goNext = () => {
-    setAnimDir("forward");
     setStep(s => Math.min(s + 1, STEPS.length - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const goBack = () => {
-    setAnimDir("back");
     setStep(s => Math.max(s - 1, 0));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Update a top-level section of wizardData
   const setSection = (key, val) => setWizardData(prev => ({ ...prev, [key]: val }));
-
-  // Merge multi-section data (used by step5)
   const mergeData = (newData) => setWizardData(prev => ({ ...prev, ...newData }));
 
-  // Step-specific onChange callbacks
+  // Step data
   const step1Data = { ...(wizardData.info || {}) };
   const step2Data = { ...(wizardData.checkin || {}) };
   const step3Data = { ...(wizardData.rules || {}) };
@@ -119,6 +116,7 @@ export default function WizardContainer({ password, onFinish }) {
     wifiName: wizardData.info?.wifiName || "",
     wifiPassword: wizardData.info?.wifiPassword || "",
   };
+  const step7Data = { ...(wizardData.personality || {}) };
 
   const handleStep5Change = (data) => {
     mergeData({
@@ -161,7 +159,6 @@ export default function WizardContainer({ password, onFinish }) {
     }
   }
 
-  // "Complete section" → finish wizard and go to admin with that section open
   function handleCompleteSection(sectionId) {
     sessionStorage.removeItem(STORAGE_KEY);
     onFinish(wizardData, sectionId);
@@ -203,7 +200,7 @@ export default function WizardContainer({ password, onFinish }) {
         <ProgressBar step={step} />
 
         {/* Step content */}
-        <div style={{ flex: 1, maxWidth: 620, width: "100%", margin: "0 auto", padding: "28px 20px 60px" }}>
+        <div style={{ flex: 1, maxWidth: 620, width: "100%", margin: "0 auto", padding: "28px 20px 120px" }}>
           <div style={{ animation: `wizardFadeIn .3s ease` }} key={step}>
             {step === 0 && (
               <Step1Logement
@@ -260,6 +257,15 @@ export default function WizardContainer({ password, onFinish }) {
               />
             )}
             {step === 6 && (
+              <StepPersonality
+                data={step7Data}
+                onChange={d => setSection("personality", d)}
+                onNext={goNext}
+                onBack={goBack}
+                wizardContacts={wizardData.info?.contacts || []}
+              />
+            )}
+            {step === 7 && (
               <Step7Recapitulatif
                 propertyData={wizardData}
                 onActivate={handleActivate}

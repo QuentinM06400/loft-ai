@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
-import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, C } from "../WizardUI";
-import { PhoneField } from "../../ui";
+import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, QuestionNav, WizardPhoneField, C } from "../WizardUI";
 
 const ROLES = ["Propriétaire", "Gestionnaire", "Contact d'urgence", "Autre"];
 
-function ContactForm({ contact = {}, onChange, onRemove, index }) {
+function ContactForm({ contact = {}, onChange, onRemove }) {
   const set = (k, v) => onChange({ ...contact, [k]: v });
+  const isOtherRole = contact.role === "Autre";
+
   return (
     <div style={{
       background: "#F7F7F5", borderRadius: 12, padding: "16px",
@@ -29,6 +30,7 @@ function ContactForm({ contact = {}, onChange, onRemove, index }) {
         onChange={v => set("name", v)}
         placeholder="Nom complet"
       />
+      {/* Role chips */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {ROLES.map(r => (
           <button
@@ -46,7 +48,16 @@ function ContactForm({ contact = {}, onChange, onRemove, index }) {
           >{r}</button>
         ))}
       </div>
-      <PhoneField value={contact.phone} onChange={v => set("phone", v)} />
+      {/* "Autre" role: show text field for custom function */}
+      {isOtherRole && (
+        <WizardTextInput
+          value={contact.roleOther || ""}
+          onChange={v => set("roleOther", v)}
+          placeholder="Précisez la fonction (ex : Femme de ménage, Voisin de confiance...)"
+          autoFocus
+        />
+      )}
+      <WizardPhoneField value={contact.phone} onChange={v => set("phone", v)} />
       <WizardTextInput
         value={contact.email}
         onChange={v => set("email", v)}
@@ -57,7 +68,7 @@ function ContactForm({ contact = {}, onChange, onRemove, index }) {
   );
 }
 
-export default function Step6Contacts({ data = {}, onChange, onNext, onSkip }) {
+export default function Step6Contacts({ data = {}, onChange, onNext, onBack, onSkip }) {
   const contacts = data.contacts || [{}];
   const setContacts = (c) => onChange({ ...data, contacts: c });
   const setContact = (i, c) => setContacts(contacts.map((x, idx) => idx === i ? c : x));
@@ -65,6 +76,7 @@ export default function Step6Contacts({ data = {}, onChange, onNext, onSkip }) {
 
   return (
     <WizardSection>
+
       {/* 6.1 Contact principal */}
       <QA index={0} question="Qui est le contact principal pour les voyageurs ?">
         <ContactForm
@@ -91,7 +103,6 @@ export default function Step6Contacts({ data = {}, onChange, onNext, onSkip }) {
               contact={c}
               onChange={newC => setContact(i + 1, newC)}
               onRemove={() => setContacts(contacts.filter((_, idx) => idx !== i + 1))}
-              index={i + 1}
             />
           ))}
           {addMore === "Oui" && (
@@ -127,7 +138,8 @@ export default function Step6Contacts({ data = {}, onChange, onNext, onSkip }) {
         </div>
       </QA>
 
-      <StepNav onNext={onNext} onSkip={onSkip} nextLabel="Voir le récapitulatif →" />
+      <StepNav onNext={onNext} nextLabel="Voir le récapitulatif →" />
+      <QuestionNav onBack={onBack} onSkip={onSkip || onNext} skipLabel="Passer" />
     </WizardSection>
   );
 }

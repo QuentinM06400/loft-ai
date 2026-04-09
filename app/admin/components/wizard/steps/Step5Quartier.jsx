@@ -1,13 +1,11 @@
 "use client";
 import { useState } from "react";
-import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, C } from "../WizardUI";
+import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, QuestionNav, C } from "../WizardUI";
 import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
-
-const POI_CATEGORIES = ["Transport", "Commerce", "Santé", "Plage", "Culture", "Sport", "Autre"];
 
 const REC_ICONS = {
   restaurants: "🍽️", barsAndCafes: "🍸", beaches: "🏖️",
-  shopping: "🛍️", markets: "🧺", nightlife: "🌙", other: "➕",
+  shopping: "🛍️", markets: "🧺", commerces: "🏪", nightlife: "🌙", other: "➕",
 };
 const ACT_ICONS = {
   onFoot: "🚶", byBoat: "⛵", excursions: "🗺️",
@@ -69,11 +67,8 @@ function SimpleItemList({ items, onChange, addLabel, fields }) {
 }
 
 function CategoryToggleSection({ categories, icons, data, onChange, itemsKey, itemFields, addLabel }) {
-  const [active, setActive] = useState(null);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {/* Category chips */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 4 }}>
         {categories.map(cat => {
           const enabled = data[cat.id]?.enabled;
@@ -84,7 +79,6 @@ function CategoryToggleSection({ categories, icons, data, onChange, itemsKey, it
               onClick={() => {
                 const wasEnabled = data[cat.id]?.enabled;
                 onChange({ ...data, [cat.id]: { ...(data[cat.id] || {}), enabled: !wasEnabled, [itemsKey]: data[cat.id]?.[itemsKey] || [] } });
-                if (!wasEnabled) setActive(cat.id);
               }}
               style={{
                 padding: "8px 14px", minHeight: 40, borderRadius: 20, fontFamily: C.font,
@@ -101,8 +95,6 @@ function CategoryToggleSection({ categories, icons, data, onChange, itemsKey, it
           );
         })}
       </div>
-
-      {/* Items for active enabled categories */}
       {categories.filter(cat => data[cat.id]?.enabled).map(cat => (
         <div key={cat.id} style={{
           padding: "12px 14px", background: "#F7F7F5", borderRadius: 10,
@@ -123,52 +115,23 @@ function CategoryToggleSection({ categories, icons, data, onChange, itemsKey, it
   );
 }
 
-export default function Step5Quartier({ data = {}, onChange, onNext, onSkip }) {
-  const location = data.location || {};
+export default function Step5Quartier({ data = {}, onChange, onNext, onBack, onSkip }) {
   const recommendations = data.recommendations || {};
   const activities = data.activities || {};
   const transport = data.transport || {};
 
-  const setLocation = v => onChange({ ...data, location: v });
   const setRecommendations = v => onChange({ ...data, recommendations: v });
   const setActivities = v => onChange({ ...data, activities: v });
   const setTransport = v => onChange({ ...data, transport: v });
 
-  const [addPOI, setAddPOI]  = useState(null);
-  const [addRec, setAddRec]  = useState(null);
-  const [addAct, setAddAct]  = useState(null);
-  const [addTrp, setAddTrp]  = useState(null);
+  const [addRec, setAddRec] = useState(null);
+  const [addAct, setAddAct] = useState(null);
+  const [addTrp, setAddTrp] = useState(null);
 
   return (
     <WizardSection>
-      {/* 5.1 Points d'intérêt */}
+      {/* Recommandations */}
       <QA index={0}
-        question="Souhaitez-vous ajouter des points d'intérêt à proximité ?"
-        sub="Gare, plage, commerces... Votre concierge les mentionnera aux voyageurs. Cette section pourra bientôt être générée automatiquement depuis votre adresse."
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <ButtonChoice
-            options={["Oui, je les ajoute", "Plus tard"]}
-            value={addPOI}
-            onChange={v => setAddPOI(v)}
-            columns={2}
-          />
-          {addPOI === "Oui, je les ajoute" && (
-            <SimpleItemList
-              items={location.pointsOfInterest || []}
-              onChange={pts => setLocation({ ...location, pointsOfInterest: pts })}
-              addLabel="+ Ajouter un lieu"
-              fields={[
-                { id: "name",            placeholder: "Nom du lieu (ex : Gare SNCF)" },
-                { id: "walkingDistance", placeholder: "Distance à pied (ex : 5 min à pied)" },
-              ]}
-            />
-          )}
-        </div>
-      </QA>
-
-      {/* 5.2 Recommandations */}
-      <QA index={1}
         question="Avez-vous des recommandations personnelles à partager ?"
         sub="Restaurants, bars, plages... Vos coups de cœur rendront votre concierge unique."
       >
@@ -196,8 +159,8 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onSkip }) {
         </div>
       </QA>
 
-      {/* 5.3 Activités */}
-      <QA index={2} question="Des activités ou visites à recommander ?">
+      {/* Activités */}
+      <QA index={1} question="Des activités ou visites à recommander ?">
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <ButtonChoice
             options={["Oui", "Plus tard"]}
@@ -222,8 +185,8 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onSkip }) {
         </div>
       </QA>
 
-      {/* 5.4 Transports */}
-      <QA index={3} question="Des informations sur les transports ?">
+      {/* Transports */}
+      <QA index={2} question="Des informations sur les transports ?">
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <ButtonChoice
             options={["Oui", "Plus tard"]}
@@ -248,7 +211,8 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onSkip }) {
         </div>
       </QA>
 
-      <StepNav onNext={onNext} onSkip={onSkip} />
+      <StepNav onNext={onNext} nextLabel="Étape suivante →" />
+      <QuestionNav onBack={onBack} onSkip={onSkip || onNext} skipLabel="Passer" />
     </WizardSection>
   );
 }
