@@ -46,7 +46,7 @@ export default function StepPersonality({ data = {}, onChange, onNext, onBack, w
             columns={1}
             withOther
           />
-          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => { set("tone", "Hospitalier et convivial"); fwd(1); }} skipLabel="Passer" />
+          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => { set("tone", "Hospitalier et convivial"); fwd(1); }} />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -56,26 +56,21 @@ export default function StepPersonality({ data = {}, onChange, onNext, onBack, w
           visible={vis}
         >
           {contactOptions.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <BigButtonChoice
-                options={contactOptions}
-                value={data.defaultContact}
-                onChange={v => { set("defaultContact", v); }}
-                columns={1}
-              />
-              <ContinueButton onClick={onNext} label="Étape suivante →" />
-            </div>
+            <BigButtonChoice
+              options={contactOptions}
+              value={data.defaultContact}
+              onChange={v => { set("defaultContact", v); }}
+              columns={1}
+            />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <BigTextInput
-                value={data.defaultContact || ""}
-                onChange={v => set("defaultContact", v)}
-                placeholder="Ex : Jean Dupont, propriétaire"
-              />
-              <ContinueButton onClick={onNext} label="Étape suivante →" />
-            </div>
+            <BigTextInput
+              value={data.defaultContact || ""}
+              onChange={v => set("defaultContact", v)}
+              placeholder="Ex : Jean Dupont, propriétaire"
+            />
           )}
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
+          <ContinueButton onClick={onNext} label="Étape suivante →" />
+          <QuestionNav onBack={bk} onSkip={onNext} />
         </QuestionScreen>
       )}
     </>

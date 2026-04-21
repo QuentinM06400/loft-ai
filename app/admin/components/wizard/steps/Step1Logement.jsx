@@ -124,7 +124,7 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             columns={2}
             withOther
           />
-          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} skipLabel="Passer" />
+          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -133,15 +133,15 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             value={{ address: data.address, city: data.city, postalCode: data.postalCode, country: data.country }}
             onChange={v => onChange({ ...data, address: v.address, city: v.city, postalCode: v.postalCode, country: v.country })}
           />
-          <ContinueButton onClick={() => fwd(apt ? 2 : 4)} label="Continuer →" />
-          <QuestionNav onBack={bk} onSkip={() => fwd(apt ? 2 : 4)} skipLabel="Passer" />
+          <ContinueButton onClick={() => fwd(apt ? 2 : 4)} />
+          <QuestionNav onBack={bk} onSkip={() => fwd(apt ? 2 : 4)} />
         </QuestionScreen>
       )}
       {q === 2 && (
         <QuestionScreen title="À quel étage se situe le logement ?" sub="0 = rez-de-chaussée" visible={vis}>
           <BigNumberStepper value={data.floor ?? 0} onChange={v => set("floor", v)} min={0} max={30} />
           <ContinueButton onClick={() => fwd(3)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(3)} />
         </QuestionScreen>
       )}
       {q === 3 && (
@@ -152,7 +152,7 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             onChange={v => { set("hasElevator", v === "Oui"); fwd(4); }}
             columns={2}
           />
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(4)} />
         </QuestionScreen>
       )}
       {q === 4 && (
@@ -162,14 +162,14 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
           </p>
           <BigTextarea value={data.description} onChange={v => set("description", v)} rows={5} />
           <ContinueButton onClick={() => fwd(5)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(5)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(5)} />
         </QuestionScreen>
       )}
       {q === 5 && (
         <QuestionScreen title="Combien de voyageurs pouvez-vous accueillir ?" visible={vis}>
           <BigNumberStepper value={data.maxGuests ?? 4} onChange={v => set("maxGuests", v)} min={1} max={20} />
           <ContinueButton onClick={() => fwd(6)} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(6)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(6)} />
         </QuestionScreen>
       )}
       {q === 6 && (
@@ -180,7 +180,7 @@ export default function Step1Logement({ data = {}, onChange, onNext, onBack, onS
             <BigNumberStepper value={data.bathrooms ?? 1} onChange={v => set("bathrooms", v)} min={0} max={10} label="Salle(s) de bain" />
           </div>
           <ContinueButton onClick={onNext} label="Étape suivante →" />
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={onNext} />
         </QuestionScreen>
       )}
     </>
