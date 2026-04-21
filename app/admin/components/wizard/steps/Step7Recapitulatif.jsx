@@ -1,5 +1,5 @@
 "use client";
-import { C } from "../WizardUI";
+import { QuestionNav, C } from "../WizardUI";
 import { PROPERTY_SCHEMA } from "@/app/lib/propertySchema";
 
 function getCompletionForSection(sectionId, propertyData) {
@@ -99,7 +99,7 @@ function SectionSummary({ section, propertyData, onComplete }) {
   );
 }
 
-export default function Step7Recapitulatif({ propertyData, onActivate, onComplete, saving }) {
+export default function Step7Recapitulatif({ propertyData, onActivate, onComplete, onBack, saving }) {
   const sections = PROPERTY_SCHEMA.sections;
   const touchedCount = sections.filter(s => propertyData[s.id]).length;
   const completedCount = sections.filter(s => {
@@ -108,7 +108,8 @@ export default function Step7Recapitulatif({ propertyData, onActivate, onComplet
   }).length;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "24px 0" }}>
+      <QuestionNav onBack={onBack} />
       {/* Header */}
       <div style={{ textAlign: "center", padding: "8px 0 16px" }}>
         <div style={{ fontSize: 40, marginBottom: 8 }}>🎉</div>

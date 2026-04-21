@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 export const C = {
@@ -53,9 +54,10 @@ export function useQuestionFlow({ count, onStepNext, onStepBack }) {
 export function QuestionScreen({ title, sub, children, visible, footer }) {
   return (
     <div className={visible ? "wVisible" : "wHidden"} style={{
+      flex: 1,
       display: "flex", flexDirection: "column", alignItems: "center",
-      justifyContent: "center", minHeight: "calc(100vh - 120px)",
-      padding: "20px 20px 120px",
+      justifyContent: "center",
+      padding: "24px 0",
     }}>
       <div style={{ maxWidth: 560, width: "100%" }}>
         <h2 style={{
@@ -73,15 +75,23 @@ export function QuestionScreen({ title, sub, children, visible, footer }) {
   );
 }
 
-// ── Bottom navigation (back + skip, fixed) ────────────────────────────────────
+// ── Bottom navigation (back + skip, fixed via portal) ─────────────────────────
+// Uses createPortal to render directly in document.body, bypassing any CSS
+// animation stacking contexts that would break position:fixed.
 export function QuestionNav({ onBack, onSkip, skipLabel = "Passer →" }) {
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
+  if (!mounted) return null;
+
+  return createPortal(
     <div style={{
       position: "fixed", bottom: 0, left: 0, right: 0,
-      padding: "12px 24px", background: "#FAFAF8",
-      borderTop: "1px solid rgba(0,0,0,0.06)",
+      height: 56,
+      padding: "0 20px",
+      background: "#FAFAF8",
+      borderTop: "1px solid rgba(0,0,0,0.08)",
       display: "flex", justifyContent: "space-between", alignItems: "center",
-      zIndex: 10,
+      zIndex: 100,
     }}>
       {onBack
         ? <button type="button" onClick={onBack} style={navBtn}>← Retour</button>
@@ -89,12 +99,13 @@ export function QuestionNav({ onBack, onSkip, skipLabel = "Passer →" }) {
       {onSkip
         ? <button type="button" onClick={onSkip} style={navBtn}>{skipLabel}</button>
         : <span />}
-    </div>
+    </div>,
+    document.body
   );
 }
 const navBtn = {
-  background: "none", border: "none", color: "#9A9A9A", fontSize: 13,
-  cursor: "pointer", fontFamily: C.font, padding: "6px 10px",
+  background: "none", border: "none", color: "#3D3D3D", fontSize: 14,
+  cursor: "pointer", fontFamily: C.font, padding: "8px 12px", fontWeight: 500,
 };
 
 // ── Continuer button ───────────────────────────────────────────────────────────
@@ -211,7 +222,8 @@ export function MultiButtonChoice({ options, value = [], onChange, columns = 2, 
       {(withOther && !hasOther && value.length > 0) || (withOther && hasOther) ? (
         !hasOther ? null : (
           <input
-            value={value.find(v => !options.includes(v)) || ""}
+            autoFocus
+            value={value.find(v => !options.includes(v) && v !== "__autre__") || ""}
             onChange={e => {
               const cleaned = value.filter(v => options.includes(v));
               if (e.target.value) onChange([...cleaned, e.target.value]);

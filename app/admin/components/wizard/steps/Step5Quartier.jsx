@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { QA, ButtonChoice, WizardSection, StepNav, C } from "../WizardUI";
+import { QA, ButtonChoice, WizardSection, QuestionNav, C } from "../WizardUI";
 import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
 
 const REC_ICONS = {
@@ -299,7 +299,7 @@ export default function Step5Quartier({ data = {}, onChange, onNext, onBack, onS
         </div>
       </QA>
 
-      <StepNav onNext={onNext} nextLabel="Étape suivante →" />
+      <QuestionNav onBack={onBack} onSkip={onNext} />
     </WizardSection>
   );
 }

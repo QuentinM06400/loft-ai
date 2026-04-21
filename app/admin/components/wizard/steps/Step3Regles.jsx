@@ -77,7 +77,7 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} skipLabel="Passer" />
+          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -99,7 +99,7 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(2)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(2)} />
         </QuestionScreen>
       )}
       {q === 2 && (
@@ -121,19 +121,19 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
               </>
             )}
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(3)} />
         </QuestionScreen>
       )}
       {q === 3 && (
         <QuestionScreen title="Quelle est votre politique sur le tabac ?" visible={vis}>
           <BigButtonChoice options={SMOKE_OPTIONS} value={data.smokingPolicy} onChange={v => { set("smokingPolicy", v); fwd(4); }} columns={2} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(4)} />
         </QuestionScreen>
       )}
       {q === 4 && (
         <QuestionScreen title="Les chaussures dans le logement ?" visible={vis}>
           <BigButtonChoice options={SHOE_OPTIONS} value={data.shoesPolicy} onChange={v => { set("shoesPolicy", v); fwd(5); }} columns={2} />
-          <QuestionNav onBack={bk} onSkip={() => fwd(5)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(5)} />
         </QuestionScreen>
       )}
       {q === 5 && (
@@ -145,8 +145,7 @@ export default function Step3Regles({ data = {}, onChange, onNext, onBack, onSki
             placeholder="Ex : Merci de laisser le logement en ordre..."
           />
           <ContinueButton onClick={onNext} label="Étape suivante →" />
-          <button type="button" onClick={onNext} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas d'autres règles →</button>
-          <QuestionNav onBack={bk} />
+          <QuestionNav onBack={bk} onSkip={onNext} />
         </QuestionScreen>
       )}
     </>

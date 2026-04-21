@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { QA, ButtonChoice, WizardTextInput, WizardSection, StepNav, WizardPhoneField, C } from "../WizardUI";
+import { QA, ButtonChoice, WizardTextInput, WizardSection, QuestionNav, WizardPhoneField, C } from "../WizardUI";
 
 const ROLES = ["Propriétaire", "Gestionnaire", "Contact d'urgence", "Autre"];
 
@@ -138,7 +138,7 @@ export default function Step6Contacts({ data = {}, onChange, onNext, onBack, onS
         </div>
       </QA>
 
-      <StepNav onNext={onNext} nextLabel="Continuer →" />
+      <QuestionNav onBack={onBack} onSkip={onNext} />
     </WizardSection>
   );
 }

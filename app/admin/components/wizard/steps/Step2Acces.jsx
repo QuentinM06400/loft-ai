@@ -115,7 +115,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(1)} />
           </div>
-          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} skipLabel="Passer" />
+          <QuestionNav onBack={hist.current.length > 0 ? bk : onBack} onSkip={() => fwd(1)} />
         </QuestionScreen>
       )}
       {q === 1 && (
@@ -133,7 +133,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(2)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(2)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(2)} />
         </QuestionScreen>
       )}
       {q === 2 && (
@@ -181,9 +181,9 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
                 autoFocus
               />
             )}
-            <ContinueButton onClick={() => fwd(3)} disabled={accessModes.length === 0} />
+            <ContinueButton onClick={() => fwd(3)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(3)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(3)} />
         </QuestionScreen>
       )}
       {q === 3 && (
@@ -198,7 +198,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             />
             <ContinueButton onClick={() => fwd(4)} />
           </div>
-          <QuestionNav onBack={bk} onSkip={() => fwd(4)} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={() => fwd(4)} />
         </QuestionScreen>
       )}
       {q === 4 && (
@@ -207,10 +207,9 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             <BigTextInput value={data.buildingCode} onChange={v => set("buildingCode", v)} placeholder="Code immeuble (optionnel) — ex : 1234A" />
             <BigTextInput value={data.unitCode} onChange={v => set("unitCode", v)} placeholder="Code logement / boîte à clés (optionnel)" />
             <InfoNote>Ces codes ne sont accessibles qu'aux voyageurs via votre concierge AI.</InfoNote>
-            <ContinueButton onClick={() => fwd(5)} label="Continuer →" />
-            <button type="button" onClick={() => fwd(5)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas de code →</button>
+            <ContinueButton onClick={() => fwd(5)} />
           </div>
-          <QuestionNav onBack={bk} />
+          <QuestionNav onBack={bk} onSkip={() => fwd(5)} />
         </QuestionScreen>
       )}
       {q === 5 && (
@@ -220,8 +219,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
           </p>
           <BigTextarea value={data.arrivalInstructions} onChange={v => set("arrivalInstructions", v)} rows={4} />
           <ContinueButton onClick={() => fwd(6)} />
-          <button type="button" onClick={() => fwd(6)} style={{ background: "none", border: "none", color: "#9A9A9A", fontSize: 13, cursor: "pointer", fontFamily: C.font, padding: "8px", margin: "0 auto", display: "block" }}>Pas d'instructions particulières →</button>
-          <QuestionNav onBack={bk} />
+          <QuestionNav onBack={bk} onSkip={() => fwd(6)} />
         </QuestionScreen>
       )}
       {q === 6 && (
@@ -233,7 +231,7 @@ export default function Step2Acces({ data = {}, onChange, onNext, onBack, onSkip
             placeholder="Ex : Vider le réfrigérateur..."
           />
           <ContinueButton onClick={onNext} label="Étape suivante →" />
-          <QuestionNav onBack={bk} onSkip={onNext} skipLabel="Passer" />
+          <QuestionNav onBack={bk} onSkip={onNext} />
         </QuestionScreen>
       )}
     </>

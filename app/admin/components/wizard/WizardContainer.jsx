@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { WizardStyles, QuestionNav, C } from "./WizardUI";
+import { WizardStyles, C } from "./WizardUI";
 import WizardWelcome      from "./WizardWelcome";
 import Step1Logement      from "./steps/Step1Logement";
 import Step2Acces         from "./steps/Step2Acces";
@@ -177,13 +177,15 @@ export default function WizardContainer({ password, onFinish }) {
     <>
       <WizardStyles />
       <div style={{
-        minHeight: "100vh", background: "#FAFAF8",
+        height: "100vh", background: "#FAFAF8",
         fontFamily: C.font, display: "flex", flexDirection: "column",
+        overflow: "hidden",
       }}>
         {/* Minimal top bar */}
         <div style={{
           padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "flex-end",
           background: "#fff", borderBottom: "1px solid rgba(0,0,0,0.06)",
+          flexShrink: 0,
         }}>
           <button
             type="button"
@@ -199,16 +201,15 @@ export default function WizardContainer({ password, onFinish }) {
         {/* Progress bar */}
         <ProgressBar step={step} />
 
-        {/* Global bottom nav */}
-        <QuestionNav
-          onBack={step > 0 ? goBack : undefined}
-          onSkip={step < 7 ? goNext : undefined}
-          skipLabel="Passer →"
-        />
-
-        {/* Step content */}
-        <div style={{ flex: 1, maxWidth: 620, width: "100%", margin: "0 auto", padding: "28px 20px 120px" }}>
-          <div style={{ animation: `wizardFadeIn .3s ease` }} key={step}>
+        {/* Scrollable step content */}
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+          <div style={{
+            flex: 1, display: "flex", flexDirection: "column",
+            maxWidth: 620, width: "100%", margin: "0 auto",
+            padding: "0 20px 80px", boxSizing: "border-box",
+            minHeight: "100%",
+          }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", animation: `wizardFadeIn .3s ease` }} key={step}>
             {step === 0 && (
               <Step1Logement
                 data={step1Data}
@@ -277,9 +278,11 @@ export default function WizardContainer({ password, onFinish }) {
                 propertyData={wizardData}
                 onActivate={handleActivate}
                 onComplete={handleCompleteSection}
+                onBack={goBack}
                 saving={saving}
               />
             )}
+            </div>
           </div>
         </div>
       </div>
