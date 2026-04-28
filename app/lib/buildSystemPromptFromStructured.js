@@ -100,30 +100,61 @@ function buildRules(d) {
   return lines.join('\n') || null;
 }
 
-function buildLighting(d) {
-  if (!d?.zones?.length) return null;
+// Remplace buildLighting + buildWindows — lit p.appliances?.lightingWizard
+function buildLightingAndWindows(lw) {
+  if (!lw) return null;
   const lines = [];
-  d.zones.forEach(z => {
-    if (!z?.zoneName) return;
-    lines.push(`${z.zoneName.toUpperCase()} (${z.controlType ?? 'interrupteur'}) :`);
-    if (z.controlLocation) lines.push(`- Commande : ${z.controlLocation}`);
-    if (z.instructions)    lines.push(`- ${z.instructions}`);
-  });
-  pushCustomFields(lines, d.customFields);
-  return lines.join('\n') || null;
-}
 
-function buildWindows(d) {
-  if (!d?.openings?.length) return null;
-  const lines = [];
-  d.openings.forEach(o => {
-    if (!o?.type) return;
-    const label = [o.type, o.room].filter(Boolean).join(' — ');
-    lines.push(`${label.toUpperCase()} :`);
-    if (o.shutterType && o.shutterType !== 'Aucun') lines.push(`- Volet : ${o.shutterType}`);
-    if (o.instructions) lines.push(`- ${o.instructions}`);
-  });
-  pushCustomFields(lines, d.customFields);
+  // ── Ouvrants / Fenêtres ──────────────────────────────────────────────────
+  if (lw.hasOpeningInstructions === 'Oui') {
+    lines.push('OUVRANTS :');
+    const scopes = lw.openingScopes || [];
+    if (scopes.includes('Tous les ouvrants') && lw.openingGeneralInstructions) {
+      lines.push(`- ${lw.openingGeneralInstructions}`);
+    }
+    if (scopes.includes('Des ouvrants spécifiques') && lw.openingSpecificItems?.length) {
+      lw.openingSpecificItems.forEach(item => {
+        if (!item) return;
+        const label = [item.room, item.location].filter(Boolean).join(' — ');
+        if (label) lines.push(`- ${label}${item.instructions ? ' : ' + item.instructions : ''}`);
+      });
+    }
+  }
+
+  // ── Fermetures (stores / volets) ─────────────────────────────────────────
+  const closureTypes = (lw.closureTypes || []).filter(t => t !== 'Aucun');
+  if (closureTypes.length) {
+    lines.push(`\nFERMETURES : ${closureTypes.join(', ')}`);
+    const storesTypes = lw.storesTypes || [];
+    if (storesTypes.length) {
+      lines.push(`- Mode : ${storesTypes.join(', ')}`);
+      if (storesTypes.includes('Manuels') && lw.storesManualNote)
+        lines.push(`- Instructions manuels : ${lw.storesManualNote}`);
+      if (storesTypes.includes('Télécommandés') && lw.storesRemoteLocation)
+        lines.push(`- Télécommande(s) : ${lw.storesRemoteLocation}`);
+    }
+    if (lw.closureInstructionType === 'Toutes les fermetures' && lw.closureGeneralInstructions) {
+      lines.push(`- ${lw.closureGeneralInstructions}`);
+    } else if (lw.closureInstructionType === 'Fermetures spécifiques' && lw.closureSpecificItems?.length) {
+      lw.closureSpecificItems.forEach(item => {
+        if (!item?.opening) return;
+        lines.push(`- ${item.opening}${item.instructions ? ' : ' + item.instructions : ''}`);
+      });
+    }
+  }
+
+  // ── Lumières ─────────────────────────────────────────────────────────────
+  const lightingTypes = lw.lightingTypes || [];
+  const hasLighting = lightingTypes.some(t => t !== 'Aucune') && lightingTypes.length > 0;
+  if (hasLighting && lw.lightingItems?.length) {
+    lines.push('\nLUMIÈRES :');
+    lw.lightingItems.forEach(item => {
+      if (!item) return;
+      const label = [item.room, item.light].filter(Boolean).join(' — ');
+      if (label) lines.push(`- ${label}${item.instruction ? ' : ' + item.instruction : ''}`);
+    });
+  }
+
   return lines.join('\n') || null;
 }
 
@@ -153,39 +184,110 @@ function buildAppliances(d) {
   return lines.join('\n') || null;
 }
 
-function buildTV(d) {
-  if (!d) return null;
+// Remplace buildTV — lit p.appliances?.tvWizard
+function buildTvWizard(tv) {
+  if (!tv) return null;
+  const equipment = tv.equipment || [];
+  if (!equipment.length) return null;
   const lines = [];
-  if (d.tvModel)    lines.push(`TV : ${d.tvModel}${d.tvLocation ? ' — ' + d.tvLocation : ''}`);
-  if (d.decoderModel)        lines.push(`Décodeur : ${d.decoderModel}`);
-  if (d.internetBoxModel)    lines.push(`Box internet : ${d.internetBoxModel}${d.internetBoxLocation ? ' (' + d.internetBoxLocation + ')' : ''}`);
-  if (d.tvMount)             lines.push(`Support : ${d.tvMount}`);
-  if (d.streamingServices?.length) lines.push(`\nStreaming : ${d.streamingServices.join(', ')}`);
-  if (d.remotes?.length) {
-    lines.push('\nTÉLÉCOMMANDES :');
-    d.remotes.forEach(r => { if (r?.name && r?.instructions) lines.push(`${r.name} : ${r.instructions}`); });
+
+  // ── TVs ──────────────────────────────────────────────────────────────────
+  if (equipment.includes('TV') && tv.tvItems?.length) {
+    const count = tv.counts?.TV || tv.tvItems.length;
+    tv.tvItems.forEach((item, i) => {
+      if (!item) return;
+      const label = count > 1 ? `TV ${i + 1}` : 'TV';
+      const model = [item.brand, item.model].filter(Boolean).join(' ');
+      lines.push(`${label}${model ? ' — ' + model : ''}${item.location ? ' (' + item.location + ')' : ''}`);
+      if (item.remote && item.remote !== 'Incluse') lines.push(`  Télécommande : ${item.remote}`);
+      if (item.notes) lines.push(`  ${item.notes}`);
+    });
+  } else if (equipment.includes('TV')) {
+    lines.push('TV disponible');
   }
-  if (d.specificInstructions) lines.push(`\n${d.specificInstructions}`);
-  pushCustomFields(lines, d.customFields);
+
+  // ── Box Internet ─────────────────────────────────────────────────────────
+  if (equipment.includes('Box Internet')) {
+    const parts = [tv.boxOperator, tv.boxLocation].filter(Boolean).join(' — ');
+    lines.push(`\nBox Internet${parts ? ' : ' + parts : ''}`);
+    if (tv.boxNotes) lines.push(`  ${tv.boxNotes}`);
+  }
+
+  // ── Décodeur ─────────────────────────────────────────────────────────────
+  if (equipment.includes('Décodeur')) {
+    const parts = [tv.decoderBrand, tv.decoderLocation].filter(Boolean).join(' — ');
+    lines.push(`\nDécodeur${parts ? ' : ' + parts : ''}`);
+    if (tv.decoderTv && tv.decoderTv !== 'Toutes') lines.push(`  Sur : ${tv.decoderTv}`);
+    if (tv.decoderNotes) lines.push(`  ${tv.decoderNotes}`);
+  }
+
+  // ── Home Cinéma ──────────────────────────────────────────────────────────
+  if (equipment.includes('Home Cinéma')) {
+    const parts = [tv.hcBrand, tv.hcLocation].filter(Boolean).join(' — ');
+    lines.push(`\nHome Cinéma${parts ? ' : ' + parts : ''}`);
+    if (tv.hcNotes) lines.push(`  ${tv.hcNotes}`);
+  }
+
+  // ── Barre de son ─────────────────────────────────────────────────────────
+  if (equipment.includes('Barre de son')) {
+    const parts = [tv.soundbarBrand, tv.soundbarLocation].filter(Boolean).join(' — ');
+    lines.push(`\nBarre de son${parts ? ' : ' + parts : ''}`);
+    if (tv.soundbarTv && tv.soundbarTv !== 'Toutes') lines.push(`  Couplée à : ${tv.soundbarTv}`);
+    if (tv.soundbarNotes) lines.push(`  ${tv.soundbarNotes}`);
+  }
+
+  // ── Streaming ────────────────────────────────────────────────────────────
+  const accessibles = Object.entries(tv.streamingAccess || {})
+    .filter(([, v]) => v?.accessible === 'Oui');
+  if (accessibles.length) {
+    lines.push('\nSTREAMING ACCESSIBLE :');
+    accessibles.forEach(([name, v]) => {
+      lines.push(`- ${name}${v.instructions ? ' : ' + v.instructions : ''}`);
+    });
+  }
+
+  // ── Autre ────────────────────────────────────────────────────────────────
+  if (equipment.includes('Autre') && tv.autreLabel) {
+    const parts = [tv.autreLabel, tv.autreLocation].filter(Boolean).join(' — ');
+    lines.push(`\n${parts}`);
+    if (tv.autreNotes) lines.push(`  ${tv.autreNotes}`);
+  }
+
   return lines.join('\n') || null;
 }
 
-function buildStorage(d) {
-  if (!d) return null;
+// Remplace buildStorage — lit p.appliances?.storageDetails
+function buildStorageWizard(s) {
+  if (!s) return null;
   const lines = [];
-  if (d.storageItems?.length) {
-    lines.push('RANGEMENTS :');
-    d.storageItems.forEach(i => { if (i?.name) lines.push(`- ${i.name} : ${i.location}${i.details ? ' — ' + i.details : ''}`); });
+
+  if (s.linensProvided === 'Oui')
+    lines.push(`Draps et serviettes : fournis${s.linensLocation ? ' — ' + s.linensLocation : ''}`);
+  else if (s.linensProvided === 'Non')
+    lines.push('Draps et serviettes : non fournis');
+
+  if (s.cleaningProvided === 'Oui')
+    lines.push(`Produits ménagers : fournis${s.cleaningLocation ? ' — ' + s.cleaningLocation : ''}`);
+  else if (s.cleaningProvided === 'Non')
+    lines.push('Produits ménagers : non fournis');
+
+  if (s.recycling) {
+    lines.push(`Tri sélectif : ${s.recycling}${s.binLocation ? ' — ' + s.binLocation : ''}`);
+  } else if (s.binLocation) {
+    lines.push(`Poubelles : ${s.binLocation}`);
   }
-  if (d.suppliedConsumables?.length) {
-    lines.push('\nCONSOMMMABLES FOURNIS :');
-    d.suppliedConsumables.forEach(i => { if (i?.name) lines.push(`- ${i.name} : ${i.location}${i.details ? ' — ' + i.details : ''}`); });
-  }
-  if (d.wasteManagement?.length) {
-    lines.push('\nPOUBELLES :');
-    d.wasteManagement.forEach(i => { if (i?.type) lines.push(`- ${i.type} : ${i.location}${i.instructions ? ' — ' + i.instructions : ''}`); });
-  }
-  pushCustomFields(lines, d.customFields);
+
+  if (s.guestClosets) lines.push(`Rangements réservés aux locataires : ${s.guestClosets}`);
+
+  return lines.join('\n') || null;
+}
+
+// Nouvelle fonction — lit p.personality
+function buildPersonality(d) {
+  if (!d?.tone && !d?.defaultContact) return null;
+  const lines = [];
+  if (d.tone) lines.push(`Ton souhaité par l'hôte : ${d.tone}`);
+  if (d.defaultContact) lines.push(`En cas de question sans réponse, orienter vers : ${d.defaultContact}`);
   return lines.join('\n') || null;
 }
 
@@ -266,19 +368,23 @@ function buildTransport(d) {
 export function buildSystemPromptFromStructured(propertyData) {
   const p = propertyData ?? {};
 
+  const lw = p.appliances?.lightingWizard;
+  const tv = p.appliances?.tvWizard;
+  const storage = p.appliances?.storageDetails;
+
   const sections = [
-    { title: 'INFORMATIONS DE L\'APPARTEMENT',    content: buildInfo(p.info) },
-    { title: 'CHECK-IN / CHECK-OUT',              content: buildCheckin(p.checkin) },
-    { title: 'RÈGLES DE LA MAISON',               content: buildRules(p.rules) },
-    { title: 'LUMIÈRES',                          content: buildLighting(p.lighting) },
-    { title: 'FENÊTRES',                          content: buildWindows(p.windows) },
+    { title: 'TON ET PERSONNALITÉ DU CONCIERGE',       content: buildPersonality(p.personality) },
+    { title: 'INFORMATIONS DE L\'APPARTEMENT',         content: buildInfo(p.info) },
+    { title: 'CHECK-IN / CHECK-OUT',                   content: buildCheckin(p.checkin) },
+    { title: 'RÈGLES DE LA MAISON',                    content: buildRules(p.rules) },
+    { title: 'FENÊTRES, FERMETURES & LUMIÈRES',        content: buildLightingAndWindows(lw) },
     { title: 'ÉLECTROMÉNAGER — GUIDES D\'UTILISATION', content: buildAppliances(p.appliances) },
-    { title: 'TV & MULTIMÉDIA',                   content: buildTV(p.tv) },
-    { title: 'RANGEMENTS & CONSOMMABLES',         content: buildStorage(p.storage) },
-    { title: 'EMPLACEMENT — PROXIMITÉ',           content: buildLocation(p.location) },
-    { title: 'RECOMMANDATIONS',                   content: buildRecommendations(p.recommendations) },
-    { title: 'ACTIVITÉS & VISITES',               content: buildActivities(p.activities) },
-    { title: 'TRANSPORTS',                        content: buildTransport(p.transport) },
+    { title: 'TV & MULTIMÉDIA',                        content: buildTvWizard(tv) },
+    { title: 'RANGEMENTS & CONSOMMABLES',              content: buildStorageWizard(storage) },
+    { title: 'EMPLACEMENT — PROXIMITÉ',                content: buildLocation(p.location) },
+    { title: 'RECOMMANDATIONS',                        content: buildRecommendations(p.recommendations) },
+    { title: 'ACTIVITÉS & VISITES',                    content: buildActivities(p.activities) },
+    { title: 'TRANSPORTS',                             content: buildTransport(p.transport) },
   ];
 
   const body = sections
