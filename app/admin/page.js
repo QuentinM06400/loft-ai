@@ -409,6 +409,27 @@ function ResetDataButton({ password, onReset }) {
 
 function Dashboard({ password, initialTab, onLogout, onRestartWizard }) {
   const [activeTab, setActiveTab] = useState(initialTab || "conversations");
+  const [propertyData, setPropertyData]       = useState(null);
+  const [contentLoading, setContentLoading]   = useState(false);
+
+  useEffect(() => {
+    if (activeTab === "content" && propertyData === null && !contentLoading) {
+      setContentLoading(true);
+      fetch("/api/content", { headers: { "x-admin-password": password } })
+        .then(r => r.json())
+        .then(d => { setPropertyData(d.propertyData || {}); setContentLoading(false); })
+        .catch(() => { setPropertyData({}); setContentLoading(false); });
+    }
+  }, [activeTab]);
+
+  async function handleContentSave(updatedData) {
+    await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ propertyData: updatedData }),
+    });
+    setPropertyData(updatedData);
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#FAFAF8", fontFamily: "'DM Sans', sans-serif" }}>
@@ -464,18 +485,13 @@ function Dashboard({ password, initialTab, onLogout, onRestartWizard }) {
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "24px 20px" }}>
         {activeTab === "conversations" && <ConversationsTab password={password} />}
         {activeTab === "content" && (
-          <div style={{
-            textAlign: "center", padding: "60px 20px",
-            color: "#6B6B6B", fontFamily: "'DM Sans', sans-serif",
-          }}>
-            <div style={{ fontSize: 32, marginBottom: 16 }}>🚧</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#1A1A1A", marginBottom: 8 }}>
-              Disponible prochainement
+          contentLoading || propertyData === null ? (
+            <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B", fontSize: 13 }}>
+              Chargement du contenu...
             </div>
-            <div style={{ fontSize: 13 }}>
-              L'onglet Contenu sera bientôt disponible.
-            </div>
-          </div>
+          ) : (
+            <ContentTab propertyData={propertyData} onSave={handleContentSave} />
+          )
         )}
       </div>
     </div>
