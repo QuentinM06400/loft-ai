@@ -792,6 +792,328 @@ function PersonaliteSection({ propertyData, onSave }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 7. ÉQUIPEMENTS  →  propertyData.appliances.items
+// ─────────────────────────────────────────────────────────────────────────────
+
+const APPLIANCE_GROUPS = [
+  {
+    label: "Cuisine",
+    items: [
+      { id: "oven",          label: "Four" },
+      { id: "cooktop",       label: "Plaques de cuisson" },
+      { id: "hood",          label: "Hotte" },
+      { id: "fridge",        label: "Réfrigérateur" },
+      { id: "freezer",       label: "Congélateur" },
+      { id: "dishwasher",    label: "Lave-vaisselle" },
+      { id: "microwave",     label: "Micro-ondes" },
+      { id: "coffeeMachine", label: "Machine à café" },
+      { id: "kettle",        label: "Bouilloire" },
+      { id: "toaster",       label: "Grille-pain" },
+      { id: "blender",       label: "Blender" },
+      { id: "foodProcessor", label: "Robot culinaire" },
+    ],
+  },
+  {
+    label: "Entretien",
+    items: [
+      { id: "washingMachine", label: "Lave-linge" },
+      { id: "dryer",          label: "Sèche-linge" },
+      { id: "vacuum",         label: "Aspirateur" },
+      { id: "iron",           label: "Fer à repasser" },
+      { id: "robotVacuum",    label: "Robot aspirateur" },
+    ],
+  },
+  {
+    label: "Confort",
+    items: [
+      { id: "airConditioning", label: "Climatisation" },
+      { id: "heating",         label: "Chauffage" },
+      { id: "waterHeater",     label: "Chauffe-eau" },
+      { id: "fan",             label: "Ventilateur" },
+      { id: "airPurifier",     label: "Purificateur d'air" },
+    ],
+  },
+  {
+    label: "Salle de bain",
+    items: [
+      { id: "hairDryer",    label: "Sèche-cheveux" },
+      { id: "towelWarmer",  label: "Sèche-serviettes" },
+    ],
+  },
+];
+
+function EquipementsSection({ propertyData, onSave }) {
+  const [items, setItems] = useState({ ...(propertyData.appliances?.items || {}) });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const setItem = (id, k, v) => setItems(prev => ({ ...prev, [id]: { ...(prev[id] || {}), [k]: v } }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({ ...propertyData, appliances: { ...(propertyData.appliances || {}), items } });
+      setSaved(true); setTimeout(() => setSaved(false), 2500);
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <AccordionSection icon="🍳" label="Équipements">
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {APPLIANCE_GROUPS.map(group => (
+          <div key={group.label} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <SubTitle>{group.label}</SubTitle>
+            {group.items.map(({ id, label }) => {
+              const item = items[id] || {};
+              const enabled = item.enabled === true || item.enabled === "Oui";
+              return (
+                <div key={id} style={{ display: "flex", flexDirection: "column", gap: 8, padding: "10px 12px", background: "#F7F7F5", borderRadius: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>{label}</span>
+                    <YesNo
+                      value={enabled ? "Oui" : item.enabled === false || item.enabled === "Non" ? "Non" : ""}
+                      onChange={v => setItem(id, "enabled", v === "Oui")}
+                    />
+                  </div>
+                  {enabled && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <Row>
+                        <Field label="Marque / Modèle">
+                          <Inp value={item.brandModel} onChange={v => setItem(id, "brandModel", v)} placeholder="Ex : Samsung WW90T" />
+                        </Field>
+                        <Field label="Emplacement">
+                          <Inp value={item.location} onChange={v => setItem(id, "location", v)} placeholder="Ex : Cuisine" />
+                        </Field>
+                      </Row>
+                      <Field label="Instructions spécifiques" sub="optionnel">
+                        <Txt value={item.specificInstructions} onChange={v => setItem(id, "specificInstructions", v)} rows={2} placeholder="Ex : Mettre à 60° pour le linge blanc..." />
+                      </Field>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <SaveButton saving={saving} saved={saved} onClick={handleSave} />
+      </div>
+    </AccordionSection>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. LUMIÈRES, FENÊTRES & FERMETURES  →  propertyData.appliances.lightingWizard
+// ─────────────────────────────────────────────────────────────────────────────
+
+function LumieresSection({ propertyData, onSave }) {
+  const [lw, setLw] = useState({ ...(propertyData.appliances?.lightingWizard || {}) });
+  const set = (k, v) => setLw(prev => ({ ...prev, [k]: v }));
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({ ...propertyData, appliances: { ...(propertyData.appliances || {}), lightingWizard: lw } });
+      setSaved(true); setTimeout(() => setSaved(false), 2500);
+    } finally { setSaving(false); }
+  };
+
+  const openingItems   = lw.openingSpecificItems  || [{}];
+  const closureItems   = lw.closureSpecificItems  || [{}];
+  const lightingItems  = lw.lightingItems         || [{}];
+
+  const setListItem = (key, i, k, v) =>
+    setLw(prev => {
+      const arr = [...(prev[key] || [{}])];
+      arr[i] = { ...(arr[i] || {}), [k]: v };
+      return { ...prev, [key]: arr };
+    });
+  const addListItem    = (key) => setLw(prev => ({ ...prev, [key]: [...(prev[key] || [{}]), {}] }));
+  const removeListItem = (key, i) => setLw(prev => ({ ...prev, [key]: (prev[key] || []).filter((_, idx) => idx !== i) }));
+
+  const hasSpecificOpening = (lw.openingScopes || []).includes("Des ouvrants spécifiques");
+  const hasStores          = (lw.closureTypes  || []).includes("Stores");
+  const lightingNotNone    = !(lw.lightingTypes || []).includes("Aucune") && (lw.lightingTypes || []).length > 0;
+
+  return (
+    <AccordionSection icon="💡" label="Lumières, Fenêtres & Fermetures">
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+        {/* Ouvrants */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Ouvrants (fenêtres)</SubTitle>
+          <Field label="Y a-t-il des instructions ?">
+            <YesNo value={lw.hasOpeningInstructions} onChange={v => set("hasOpeningInstructions", v)} />
+          </Field>
+          {lw.hasOpeningInstructions === "Oui" && (
+            <>
+              <Field label="Portée">
+                <MultiCheck
+                  options={["Tous les ouvrants", "Des ouvrants spécifiques"]}
+                  value={lw.openingScopes || []}
+                  onChange={v => set("openingScopes", v)}
+                />
+              </Field>
+              <Field label="Instructions générales">
+                <Txt value={lw.openingGeneralInstructions} onChange={v => set("openingGeneralInstructions", v)} rows={3} placeholder="Ex : Ne pas laisser les fenêtres ouvertes la nuit..." />
+              </Field>
+              {hasSpecificOpening && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <Label text="Ouvrants spécifiques" />
+                  {openingItems.map((item, i) => (
+                    <div key={i} style={{ padding: "10px 12px", background: "#F7F7F5", borderRadius: 10, display: "flex", flexDirection: "column", gap: 8, position: "relative" }}>
+                      {openingItems.length > 1 && (
+                        <button type="button" onClick={() => removeListItem("openingSpecificItems", i)} style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: 6, border: "none", background: "rgba(229,62,62,0.1)", color: "#E53E3E", cursor: "pointer", fontSize: 12 }}>✕</button>
+                      )}
+                      <Row>
+                        <Field label="Pièce"><Inp value={item.room} onChange={v => setListItem("openingSpecificItems", i, "room", v)} placeholder="Chambre" /></Field>
+                        <Field label="Emplacement"><Inp value={item.location} onChange={v => setListItem("openingSpecificItems", i, "location", v)} placeholder="Fenêtre côté rue" /></Field>
+                      </Row>
+                      <Field label="Instructions"><Txt value={item.instructions} onChange={v => setListItem("openingSpecificItems", i, "instructions", v)} rows={2} /></Field>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => addListItem("openingSpecificItems")} style={{ padding: "8px", borderRadius: 10, border: `2px dashed rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.02)", color: G, fontSize: 13, cursor: "pointer", fontFamily: FONT }}>+ Ajouter un ouvrant</button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Fermetures */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Fermetures (stores / volets)</SubTitle>
+          <Field label="Types présents">
+            <MultiCheck options={["Stores", "Volets", "Aucun"]} value={lw.closureTypes || []} onChange={v => set("closureTypes", v)} />
+          </Field>
+          {hasStores && (
+            <>
+              <Field label="Type de stores">
+                <MultiCheck options={["Manuels", "Télécommandés"]} value={lw.storesTypes || []} onChange={v => set("storesTypes", v)} />
+              </Field>
+              {(lw.storesTypes || []).includes("Manuels") && (
+                <Field label="Note (stores manuels)"><Inp value={lw.storesManualNote} onChange={v => set("storesManualNote", v)} placeholder="Ex : Manivelle dans le placard..." /></Field>
+              )}
+              {(lw.storesTypes || []).includes("Télécommandés") && (
+                <Field label="Emplacement télécommande"><Inp value={lw.storesRemoteLocation} onChange={v => set("storesRemoteLocation", v)} placeholder="Ex : Tiroir meuble TV" /></Field>
+              )}
+            </>
+          )}
+          <Field label="Type d'instructions">
+            <Sel value={lw.closureInstructionType} onChange={v => set("closureInstructionType", v)} options={["Toutes", "Spécifiques", "Aucune"]} />
+          </Field>
+          {lw.closureInstructionType === "Toutes" && (
+            <Field label="Instructions générales">
+              <Txt value={lw.closureGeneralInstructions} onChange={v => set("closureGeneralInstructions", v)} rows={3} />
+            </Field>
+          )}
+          {lw.closureInstructionType === "Spécifiques" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Label text="Fermetures spécifiques" />
+              {closureItems.map((item, i) => (
+                <div key={i} style={{ padding: "10px 12px", background: "#F7F7F5", borderRadius: 10, display: "flex", flexDirection: "column", gap: 8, position: "relative" }}>
+                  {closureItems.length > 1 && (
+                    <button type="button" onClick={() => removeListItem("closureSpecificItems", i)} style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: 6, border: "none", background: "rgba(229,62,62,0.1)", color: "#E53E3E", cursor: "pointer", fontSize: 12 }}>✕</button>
+                  )}
+                  <Field label="Ouvrant"><Inp value={item.opening} onChange={v => setListItem("closureSpecificItems", i, "opening", v)} placeholder="Volet chambre" /></Field>
+                  <Field label="Instructions"><Txt value={item.instructions} onChange={v => setListItem("closureSpecificItems", i, "instructions", v)} rows={2} /></Field>
+                </div>
+              ))}
+              <button type="button" onClick={() => addListItem("closureSpecificItems")} style={{ padding: "8px", borderRadius: 10, border: `2px dashed rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.02)", color: G, fontSize: 13, cursor: "pointer", fontFamily: FONT }}>+ Ajouter une fermeture</button>
+            </div>
+          )}
+        </div>
+
+        {/* Lumières */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Lumières</SubTitle>
+          <Field label="Type d'infos">
+            <MultiCheck options={["Utilisation", "Emplacements", "Aucune"]} value={lw.lightingTypes || []} onChange={v => set("lightingTypes", v)} />
+          </Field>
+          {lightingNotNone && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Label text="Points lumineux" />
+              {lightingItems.map((item, i) => (
+                <div key={i} style={{ padding: "10px 12px", background: "#F7F7F5", borderRadius: 10, display: "flex", flexDirection: "column", gap: 8, position: "relative" }}>
+                  {lightingItems.length > 1 && (
+                    <button type="button" onClick={() => removeListItem("lightingItems", i)} style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: 6, border: "none", background: "rgba(229,62,62,0.1)", color: "#E53E3E", cursor: "pointer", fontSize: 12 }}>✕</button>
+                  )}
+                  <Row>
+                    <Field label="Pièce"><Inp value={item.room} onChange={v => setListItem("lightingItems", i, "room", v)} placeholder="Salon" /></Field>
+                    <Field label="Lumière"><Inp value={item.light} onChange={v => setListItem("lightingItems", i, "light", v)} placeholder="Lampadaire" /></Field>
+                  </Row>
+                  <Field label="Instruction"><Txt value={item.instruction} onChange={v => setListItem("lightingItems", i, "instruction", v)} rows={2} placeholder="Interrupteur derrière la porte..." /></Field>
+                </div>
+              ))}
+              <button type="button" onClick={() => addListItem("lightingItems")} style={{ padding: "8px", borderRadius: 10, border: `2px dashed rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.02)", color: G, fontSize: 13, cursor: "pointer", fontFamily: FONT }}>+ Ajouter un point lumineux</button>
+            </div>
+          )}
+        </div>
+
+        <SaveButton saving={saving} saved={saved} onClick={handleSave} />
+      </div>
+    </AccordionSection>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 9. RANGEMENTS  →  propertyData.appliances.storageDetails
+// ─────────────────────────────────────────────────────────────────────────────
+
+function RangementsSection({ propertyData, onSave }) {
+  const [s, setS] = useState({ ...(propertyData.appliances?.storageDetails || {}) });
+  const set = (k, v) => setS(prev => ({ ...prev, [k]: v }));
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({ ...propertyData, appliances: { ...(propertyData.appliances || {}), storageDetails: s } });
+      setSaved(true); setTimeout(() => setSaved(false), 2500);
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <AccordionSection icon="🗄️" label="Rangements">
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <Field label="Draps et serviettes fournis ?">
+          <YesNo value={s.linensProvided} onChange={v => set("linensProvided", v)} />
+        </Field>
+        {s.linensProvided === "Oui" && (
+          <Field label="Emplacement draps / serviettes">
+            <Inp value={s.linensLocation} onChange={v => set("linensLocation", v)} placeholder="Ex : Placard couloir, étagère du haut" />
+          </Field>
+        )}
+
+        <Field label="Produits ménagers fournis ?">
+          <YesNo value={s.cleaningProvided} onChange={v => set("cleaningProvided", v)} />
+        </Field>
+        {s.cleaningProvided === "Oui" && (
+          <Field label="Emplacement produits ménagers">
+            <Inp value={s.cleaningLocation} onChange={v => set("cleaningLocation", v)} placeholder="Ex : Sous l'évier cuisine" />
+          </Field>
+        )}
+
+        <Field label="Tri sélectif ?">
+          <YesNo value={s.recycling} onChange={v => set("recycling", v)} />
+        </Field>
+
+        <Field label="Emplacement des poubelles">
+          <Inp value={s.binLocation} onChange={v => set("binLocation", v)} placeholder="Ex : Local poubelles rez-de-chaussée, code 1234" />
+        </Field>
+
+        <Field label="Placards réservés aux locataires">
+          <Txt value={s.guestClosets} onChange={v => set("guestClosets", v)} rows={3} placeholder="Ex : Placard chambre libre, 2 tiroirs à droite dans la cuisine..." />
+        </Field>
+
+        <SaveButton saving={saving} saved={saved} onClick={handleSave} />
+      </div>
+    </AccordionSection>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ContentTab
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -799,11 +1121,14 @@ export default function ContentTab({ propertyData, onSave }) {
   const pd = propertyData || {};
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <LogementSection   propertyData={pd} onSave={onSave} />
-      <AccesSection      propertyData={pd} onSave={onSave} />
-      <ReglesSection     propertyData={pd} onSave={onSave} />
-      <TvSection         propertyData={pd} onSave={onSave} />
-      <ContactsSection   propertyData={pd} onSave={onSave} />
+      <LogementSection    propertyData={pd} onSave={onSave} />
+      <AccesSection       propertyData={pd} onSave={onSave} />
+      <ReglesSection      propertyData={pd} onSave={onSave} />
+      <EquipementsSection propertyData={pd} onSave={onSave} />
+      <LumieresSection    propertyData={pd} onSave={onSave} />
+      <RangementsSection  propertyData={pd} onSave={onSave} />
+      <TvSection          propertyData={pd} onSave={onSave} />
+      <ContactsSection    propertyData={pd} onSave={onSave} />
       <PersonaliteSection propertyData={pd} onSave={onSave} />
     </div>
   );
