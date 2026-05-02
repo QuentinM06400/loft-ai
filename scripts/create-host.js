@@ -38,23 +38,35 @@ function hashPassword(password) {
 
 function readPassword(prompt) {
   return new Promise((resolve) => {
+    // If stdin is not a TTY (non-interactive context), use plain readline
+    if (!process.stdin.isTTY) {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+      rl.question(prompt, (answer) => { rl.close(); resolve(answer) })
+      return
+    }
+
     process.stdout.write(prompt)
     const chars = []
     process.stdin.setRawMode(true)
     process.stdin.resume()
     process.stdin.setEncoding('utf8')
 
+    const CTRL_C = ''
+    const BACKSPACE = ''
+    const CR = '\r'
+    const LF = '\n'
+
     function onData(char) {
-      if (char === '\r' || char === '\n') {
+      if (char === CR || char === LF) {
         process.stdin.setRawMode(false)
         process.stdin.pause()
         process.stdin.removeListener('data', onData)
         process.stdout.write('\n')
         resolve(chars.join(''))
-      } else if (char === '') {
+      } else if (char === CTRL_C) {
         process.stdout.write('\n')
         process.exit()
-      } else if (char === '') {
+      } else if (char === BACKSPACE) {
         if (chars.length > 0) {
           chars.pop()
           process.stdout.clearLine(0)
