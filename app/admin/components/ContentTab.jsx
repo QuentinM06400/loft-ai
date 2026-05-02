@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Design tokens
@@ -1114,6 +1115,145 @@ function RangementsSection({ propertyData, onSave }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 10. QUARTIER  →  propertyData.recommendations / activities / transport
+// ─────────────────────────────────────────────────────────────────────────────
+
+const REC_ICONS  = { restaurants:"🍽️", barsAndCafes:"🍸", beaches:"🏖️", shopping:"🛍️", markets:"🧺", commerces:"🏪", nightlife:"🌙", other:"➕" };
+const ACT_ICONS  = { onFoot:"🚶", byBoat:"⛵", excursions:"🗺️", sportsAndWellness:"🏋️", cultureAndMuseums:"🏛️", familyAndKids:"👨‍👩‍👧", other:"➕" };
+const TRP_ICONS  = { publicTransport:"🚌", train:"🚆", taxiAndRideshare:"🚕", carRental:"🚗", bicycle:"🚲", other:"➕" };
+
+function CategoryItems({ cat, data, itemsKey, itemFields, onChange }) {
+  const items = data[cat.id]?.[itemsKey] || [];
+  const enabled = data[cat.id]?.enabled;
+
+  const update = (i, k, v) =>
+    onChange({ ...data, [cat.id]: { ...(data[cat.id] || {}), [itemsKey]: items.map((it, idx) => idx === i ? { ...it, [k]: v } : it) } });
+  const add = () =>
+    onChange({ ...data, [cat.id]: { ...(data[cat.id] || {}), [itemsKey]: [...items, {}] } });
+  const remove = (i) =>
+    onChange({ ...data, [cat.id]: { ...(data[cat.id] || {}), [itemsKey]: items.filter((_, idx) => idx !== i) } });
+
+  if (!enabled) return null;
+  return (
+    <div style={{ padding: "10px 12px", background: "#F7F7F5", borderRadius: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ background: "#fff", borderRadius: 8, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 6, position: "relative" }}>
+          <button type="button" onClick={() => remove(i)} style={{ position: "absolute", top: 6, right: 6, width: 22, height: 22, borderRadius: 5, border: "none", background: "rgba(229,62,62,0.1)", color: "#E53E3E", cursor: "pointer", fontSize: 11 }}>✕</button>
+          {itemFields.map(f => (
+            <Inp key={f.id} value={item[f.id]} onChange={v => update(i, f.id, v)} placeholder={f.placeholder} />
+          ))}
+        </div>
+      ))}
+      <button type="button" onClick={add} style={{ padding: "7px", borderRadius: 8, border: `2px dashed rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.02)", color: G, fontSize: 12, cursor: "pointer", fontFamily: FONT }}>+ Ajouter</button>
+    </div>
+  );
+}
+
+function CatToggleGroup({ categories, icons, data, onChange, itemsKey, itemFields }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {categories.map(cat => {
+          const enabled = data[cat.id]?.enabled;
+          return (
+            <button key={cat.id} type="button" onClick={() =>
+              onChange({ ...data, [cat.id]: { ...(data[cat.id] || {}), enabled: !enabled, [itemsKey]: data[cat.id]?.[itemsKey] || [] } })}
+              style={{
+                padding: "7px 12px", borderRadius: 20, fontSize: 12, fontFamily: FONT,
+                border: enabled ? `2px solid ${G}` : "1px solid rgba(0,0,0,0.12)",
+                background: enabled ? "rgba(42,107,90,0.1)" : "#fff",
+                color: enabled ? G : "#1A1A1A", fontWeight: enabled ? 600 : 400, cursor: "pointer",
+              }}
+            >{icons[cat.id]} {cat.label}{enabled ? " ✓" : ""}</button>
+          );
+        })}
+      </div>
+      {categories.filter(cat => data[cat.id]?.enabled).map(cat => (
+        <div key={cat.id}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: G, marginBottom: 4 }}>{icons[cat.id]} {cat.label}</div>
+          <CategoryItems cat={cat} data={data} itemsKey={itemsKey} itemFields={itemFields} onChange={onChange} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QuartierSection({ propertyData, onSave }) {
+  const [recs, setRecs]  = useState({ ...(propertyData.recommendations?.categories || {}) });
+  const [acts, setActs]  = useState({ ...(propertyData.activities?.categories || {}) });
+  const [trps, setTrps]  = useState({ ...(propertyData.transport?.categories || {}) });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({
+        ...propertyData,
+        recommendations: { ...(propertyData.recommendations || {}), categories: recs },
+        activities:      { ...(propertyData.activities      || {}), categories: acts },
+        transport:       { ...(propertyData.transport       || {}), categories: trps },
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2500);
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <AccordionSection icon="🗺️" label="Quartier & Recommandations">
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Recommandations</SubTitle>
+          <CatToggleGroup
+            categories={RECOMMENDATION_CATEGORIES}
+            icons={REC_ICONS}
+            data={recs}
+            onChange={setRecs}
+            itemsKey="places"
+            itemFields={[
+              { id: "name",           placeholder: "Nom du lieu" },
+              { id: "whyWeRecommend", placeholder: "Ce qu'on y aime..." },
+            ]}
+          />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Activités & Visites</SubTitle>
+          <CatToggleGroup
+            categories={ACTIVITY_CATEGORIES}
+            icons={ACT_ICONS}
+            data={acts}
+            onChange={setActs}
+            itemsKey="activities"
+            itemFields={[
+              { id: "name",        placeholder: "Nom de l'activité" },
+              { id: "description", placeholder: "En quelques mots..." },
+            ]}
+          />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <SubTitle>Transports</SubTitle>
+          <CatToggleGroup
+            categories={TRANSPORT_CATEGORIES}
+            icons={TRP_ICONS}
+            data={trps}
+            onChange={setTrps}
+            itemsKey="options"
+            itemFields={[
+              { id: "name",             placeholder: "Nom / Ligne (ex : Bus 200)" },
+              { id: "practicalDetails", placeholder: "Infos pratiques (arrêt, tarif...)" },
+            ]}
+          />
+        </div>
+
+        <SaveButton saving={saving} saved={saved} onClick={handleSave} />
+      </div>
+    </AccordionSection>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ContentTab
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1128,6 +1268,7 @@ export default function ContentTab({ propertyData, onSave }) {
       <LumieresSection    propertyData={pd} onSave={onSave} />
       <RangementsSection  propertyData={pd} onSave={onSave} />
       <TvSection          propertyData={pd} onSave={onSave} />
+      <QuartierSection    propertyData={pd} onSave={onSave} />
       <ContactsSection    propertyData={pd} onSave={onSave} />
       <PersonaliteSection propertyData={pd} onSave={onSave} />
     </div>
