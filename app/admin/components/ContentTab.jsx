@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
+import ImportModal from "./ImportModal";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Design tokens
@@ -1259,8 +1260,46 @@ function QuartierSection({ propertyData, onSave }) {
 
 export default function ContentTab({ propertyData, onSave }) {
   const pd = propertyData || {};
+  const [showImport, setShowImport] = useState(false);
+
+  async function handleImport(data) {
+    const merged = {
+      ...pd,
+      ...(data.info     ? { info:     { ...(pd.info     || {}), ...data.info     } } : {}),
+      ...(data.checkin  ? { checkin:  { ...(pd.checkin  || {}), ...data.checkin  } } : {}),
+      ...(data.rules    ? { rules:    { ...(pd.rules    || {}), ...data.rules    } } : {}),
+      ...(data.appliances ? { appliances: { ...(pd.appliances || {}), ...data.appliances } } : {}),
+    };
+    await onSave(merged);
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {showImport && (
+        <ImportModal
+          onImport={data => { handleImport(data); setShowImport(false); }}
+          onClose={() => setShowImport(false)}
+        />
+      )}
+
+      {/* Import button */}
+      <button
+        type="button"
+        onClick={() => setShowImport(true)}
+        style={{
+          width: "100%", padding: "13px 18px", borderRadius: 12,
+          border: `1.5px solid ${G}`, background: "#fff",
+          color: G, fontFamily: FONT, fontSize: 13, fontWeight: 600,
+          cursor: "pointer", display: "flex", alignItems: "center",
+          justifyContent: "center", gap: 8,
+          transition: "background .15s",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = "rgba(42,107,90,0.05)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
+      >
+        🔄 Importer / Mettre à jour depuis Airbnb
+      </button>
+
       <LogementSection    propertyData={pd} onSave={onSave} />
       <AccesSection       propertyData={pd} onSave={onSave} />
       <ReglesSection      propertyData={pd} onSave={onSave} />

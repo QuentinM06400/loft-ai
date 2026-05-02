@@ -164,11 +164,23 @@ export default function WizardContainer({ password, onFinish }) {
     onFinish(wizardData, sectionId);
   }
 
+  function handleImportData(data) {
+    setWizardData(prev => ({
+      ...prev,
+      ...(data.info     ? { info:     { ...(prev.info     || {}), ...data.info     } } : {}),
+      ...(data.checkin  ? { checkin:  { ...(prev.checkin  || {}), ...data.checkin  } } : {}),
+      ...(data.rules    ? { rules:    { ...(prev.rules    || {}), ...data.rules    } } : {}),
+      ...(data.appliances ? { appliances: { ...(prev.appliances || {}), ...data.appliances } } : {}),
+    }));
+    setShowWelcome(false);
+    setStep(0);
+  }
+
   if (showWelcome) {
     return (
       <>
         <WizardStyles />
-        <WizardWelcome onManual={() => setShowWelcome(false)} />
+        <WizardWelcome onManual={() => setShowWelcome(false)} onImportData={handleImportData} />
       </>
     );
   }

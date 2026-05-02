@@ -1,13 +1,24 @@
 "use client";
+import { useState } from "react";
 import { C } from "./WizardUI";
+import ImportModal from "../ImportModal";
 
-export default function WizardWelcome({ onManual }) {
+export default function WizardWelcome({ onManual, onImportData }) {
+  const [showImport, setShowImport] = useState(false);
+
   return (
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
       background: "#FAFAF8", fontFamily: C.font, padding: "24px 20px",
     }}>
+      {showImport && (
+        <ImportModal
+          onImport={data => { onImportData?.(data); setShowImport(false); }}
+          onClose={() => setShowImport(false)}
+        />
+      )}
+
       {/* Logo */}
       <div style={{ textAlign: "center", marginBottom: 40 }}>
         <div style={{
@@ -27,38 +38,37 @@ export default function WizardWelcome({ onManual }) {
       {/* Buttons */}
       <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: 440 }}>
 
-        {/* Import button — disabled */}
-        <div style={{ position: "relative" }}>
-          <button
-            type="button"
-            disabled
-            style={{
-              width: "100%", padding: "20px 24px", borderRadius: 16,
-              border: "2px solid rgba(0,0,0,0.08)",
-              background: "rgba(0,0,0,0.03)", cursor: "not-allowed",
-              fontFamily: C.font, textAlign: "left",
-              display: "flex", alignItems: "center", gap: 16,
-              opacity: 0.65,
-            }}
-          >
-            <span style={{ fontSize: 28 }}>📥</span>
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 3 }}>
-                Importer mon annonce Airbnb, Booking ou autre
-              </div>
-              <div style={{ fontSize: 12, color: "#6B6B6B" }}>
-                Collez le lien de votre annonce pour pré-remplir automatiquement votre profil
-              </div>
+        {/* Import button */}
+        <button
+          type="button"
+          onClick={() => setShowImport(true)}
+          style={{
+            width: "100%", padding: "20px 24px", borderRadius: 16,
+            border: `2px solid ${C.green}`,
+            background: "#fff", cursor: "pointer",
+            fontFamily: C.font, textAlign: "left",
+            display: "flex", alignItems: "center", gap: 16,
+            transition: "all .15s",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "rgba(42,107,90,0.04)";
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(42,107,90,0.14)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <span style={{ fontSize: 28 }}>📥</span>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: C.green, marginBottom: 3 }}>
+              Importer depuis Airbnb / Booking
             </div>
-          </button>
-          <div style={{
-            position: "absolute", top: 10, right: 12, padding: "3px 10px",
-            borderRadius: 20, background: "rgba(0,0,0,0.08)",
-            fontSize: 11, fontWeight: 600, color: "#6B6B6B", letterSpacing: "0.04em",
-          }}>
-            Bientôt disponible
+            <div style={{ fontSize: 12, color: "#6B6B6B" }}>
+              Collez le lien de votre annonce pour pré-remplir automatiquement votre profil
+            </div>
           </div>
-        </div>
+        </button>
 
         {/* Manual config button */}
         <button
