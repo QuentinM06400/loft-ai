@@ -457,16 +457,32 @@ function ReglesSection({ propertyData, onSave }) {
 const TV_HARDWARE   = ["TV", "Box Internet", "Décodeur", "Home Cinéma", "Barre de son", "Autre"];
 const TV_STREAMING  = ["Netflix", "Disney+", "Amazon Prime Video", "Apple TV+", "Canal+", "Spotify"];
 const REMOTE_OPTS   = ["Incluse", "Téléphone requis", "Application TV", "Pas de télécommande"];
+const STREAMING_NORMALIZE = {
+  "Prime Video":   "Amazon Prime Video",
+  "Amazon Prime":  "Amazon Prime Video",
+};
 
 function TvSection({ propertyData, onSave }) {
   const src = (propertyData.appliances || {}).tvWizard || {};
+
+  // Normalize legacy streamingAccess keys (e.g. "Prime Video" → "Amazon Prime Video")
+  const normalizedStreamingAccess = {};
+  Object.entries(src.streamingAccess || {}).forEach(([k, v]) => {
+    normalizedStreamingAccess[STREAMING_NORMALIZE[k] || k] = v;
+  });
+
   const equipmentInit = (() => {
     const base = src.equipment || [];
-    const fromAccess = Object.entries(src.streamingAccess || {})
-      .filter(([k, v]) => v?.accessible === "Oui" && TV_STREAMING.includes(k) && !base.includes(k))
-      .map(([k]) => k);
-    return [...base, ...fromAccess];
+    const merged = new Set(base);
+    Object.keys(src.streamingAccess || {}).forEach(service => {
+      const normalized = STREAMING_NORMALIZE[service] || service;
+      if (src.streamingAccess[service]?.accessible === "Oui" && TV_STREAMING.includes(normalized)) {
+        merged.add(normalized);
+      }
+    });
+    return [...merged];
   })();
+
   const [d, setD] = useState({
     equipment:      equipmentInit,
     counts:         src.counts         || {},
@@ -483,7 +499,7 @@ function TvSection({ propertyData, onSave }) {
     soundbarBrand:  src.soundbarBrand  || "",
     soundbarLocation:src.soundbarLocation|| "",
     soundbarNotes:  src.soundbarNotes  || "",
-    streamingAccess:src.streamingAccess|| {},
+    streamingAccess:normalizedStreamingAccess,
     autreLabel:     src.autreLabel     || "",
     autreLocation:  src.autreLocation  || "",
     autreNotes:     src.autreNotes     || "",
