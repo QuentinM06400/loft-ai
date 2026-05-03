@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import FirecrawlApp from "@mendable/firecrawl-js";
+import { FirecrawlAppV1 as FirecrawlApp } from "@mendable/firecrawl-js";
 
 const SYSTEM_PROMPT = `Tu es un extracteur de données d'annonces de location courte durée.
 Analyse le texte fourni et extrais uniquement les informations présentes.
