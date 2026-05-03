@@ -655,7 +655,7 @@ function generateConvId() {
   return "conv_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
 }
 
-export default function LoftAI() {
+export default function LoftAI({ hostId = 'cannes-loft' }) {
   const [lang, setLang] = useState(null);
   const [langLabel, setLangLabel] = useState("");
   const [messages, setMessages] = useState([]);
@@ -746,6 +746,7 @@ export default function LoftAI() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: convIdRef.current,
+          hostId,
           messages: updatedHistory,
           language: lang,
           startedAt: startedAtRef.current,
@@ -775,6 +776,7 @@ export default function LoftAI() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          hostId,
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
             ...newHistory
