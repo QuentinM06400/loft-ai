@@ -460,8 +460,15 @@ const REMOTE_OPTS   = ["Incluse", "Téléphone requis", "Application TV", "Pas d
 
 function TvSection({ propertyData, onSave }) {
   const src = (propertyData.appliances || {}).tvWizard || {};
+  const equipmentInit = (() => {
+    const base = src.equipment || [];
+    const fromAccess = Object.entries(src.streamingAccess || {})
+      .filter(([k, v]) => v?.accessible === "Oui" && TV_STREAMING.includes(k) && !base.includes(k))
+      .map(([k]) => k);
+    return [...base, ...fromAccess];
+  })();
   const [d, setD] = useState({
-    equipment:      src.equipment      || [],
+    equipment:      equipmentInit,
     counts:         src.counts         || {},
     tvItems:        src.tvItems        || [],
     boxOperator:    src.boxOperator    || "",
