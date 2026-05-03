@@ -131,8 +131,15 @@ export async function POST(req) {
     }
 
     const message = await res.json();
-    const rawText = message.content[0].text.trim();
-    const data = JSON.parse(rawText);
+    const raw = message.content
+      .map(i => i.text || '')
+      .join('')
+      .trim()
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/```\s*$/i, '')
+      .trim();
+    const data = JSON.parse(raw);
 
     return NextResponse.json({ success: true, data });
   } catch (err) {
