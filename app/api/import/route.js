@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import FirecrawlApp from "@mendable/firecrawl-js";
 
 const SYSTEM_PROMPT = `Tu es un extracteur de données d'annonces de location courte durée.
 Analyse le texte fourni et extrais uniquement les informations présentes.
@@ -66,22 +67,14 @@ export async function POST(req) {
 
     if (url && !text) {
       try {
-        const jinaUrl = `https://r.jina.ai/${url}`;
-        const res = await fetch(jinaUrl, {
-          headers: {
-            "Accept": "text/plain",
-            "X-Return-Format": "markdown",
-          },
-        });
+        const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
+        const result = await app.scrapeUrl(url, { formats: ["markdown"] });
 
-        if (res.status >= 400) {
+        if (!result.success || !result.markdown || result.markdown.length < 200) {
           return NextResponse.json({ blocked: true });
         }
 
-        extractedText = (await res.text()).trim();
-        if (!extractedText || extractedText.length < 200) {
-          return NextResponse.json({ blocked: true });
-        }
+        extractedText = result.markdown;
       } catch {
         return NextResponse.json({ blocked: true });
       }
