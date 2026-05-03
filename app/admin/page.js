@@ -347,9 +347,9 @@ function ResetDataButton({ onReset }) {
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
-function Dashboard({ hostId, initialTab, onLogout, onRestartWizard }) {
+function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPropertyData }) {
   const [activeTab,      setActiveTab]      = useState(initialTab || "conversations");
-  const [propertyData,   setPropertyData]   = useState(null);
+  const [propertyData,   setPropertyData]   = useState(initialPropertyData ?? null);
   const [contentLoading, setContentLoading] = useState(false);
   const router = useRouter();
 
@@ -357,11 +357,11 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard }) {
     if (activeTab === "content" && propertyData === null && !contentLoading) {
       setContentLoading(true);
       fetch("/api/content")
-        .then(r => r.json())
-        .then(d => { setPropertyData(d.propertyData || {}); setContentLoading(false); })
-        .catch(() => { setPropertyData({}); setContentLoading(false); });
+        .then(r => { if (!r.ok) throw new Error("unauthorized"); return r.json(); })
+        .then(d => { setPropertyData(d.propertyData ?? null); setContentLoading(false); })
+        .catch(() => { setContentLoading(false); });
     }
-  }, [activeTab]);
+  }, [activeTab, propertyData, contentLoading]);
 
   async function handleContentSave(updatedData) {
     await fetch("/api/content", {
@@ -416,8 +416,10 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard }) {
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "24px 20px" }}>
         {activeTab === "conversations" && <ConversationsTab />}
         {activeTab === "content" && (
-          contentLoading || propertyData === null ? (
+          contentLoading ? (
             <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B", fontSize: 13 }}>Chargement du contenu...</div>
+          ) : propertyData === null ? (
+            <div style={{ textAlign: "center", padding: 60, color: "#E53E3E", fontSize: 13 }}>Impossible de charger le contenu. Vérifiez votre session.</div>
           ) : (
             <ContentTab propertyData={propertyData} onSave={handleContentSave} />
           )
@@ -430,9 +432,10 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard }) {
 // ─── AdminPage ────────────────────────────────────────────────────────────────
 // uiState: 'loading' | 'login' | 'choice' | 'wizard' | 'dashboard'
 export default function AdminPage() {
-  const [uiState,    setUiState]    = useState("loading");
-  const [hostId,     setHostId]     = useState(null);
-  const [initialTab, setInitialTab] = useState("conversations");
+  const [uiState,       setUiState]       = useState("loading");
+  const [hostId,        setHostId]        = useState(null);
+  const [initialTab,    setInitialTab]    = useState("conversations");
+  const [propertyData,  setPropertyData]  = useState(null);
 
   // Check existing session on mount
   useEffect(() => {
@@ -454,7 +457,12 @@ export default function AdminPage() {
       const res  = await fetch("/api/content");
       if (!res.ok) { setUiState("wizard"); return; }
       const data = await res.json();
-      setUiState(data.propertyData ? "dashboard" : "wizard");
+      if (data.propertyData) {
+        setPropertyData(data.propertyData);
+        setUiState("dashboard");
+      } else {
+        setUiState("wizard");
+      }
     } catch {
       setUiState("wizard");
     }
@@ -476,6 +484,7 @@ export default function AdminPage() {
   }
 
   function handleWizardFinish(savedData, goToSection) {
+    if (savedData) setPropertyData(savedData);
     setUiState("dashboard");
     if (goToSection) setInitialTab("content");
   }
@@ -509,8 +518,9 @@ export default function AdminPage() {
     <Dashboard
       hostId={hostId}
       initialTab={initialTab}
+      initialPropertyData={propertyData}
       onLogout={handleLogout}
-      onRestartWizard={() => setUiState("wizard")}
+      onRestartWizard={() => { setPropertyData(null); setUiState("wizard"); }}
     />
   );
 }
