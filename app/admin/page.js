@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { t } from "@/app/lib/i18n";
 import ContentTab from "@/app/admin/components/ContentTab";
@@ -351,17 +351,22 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
   const [activeTab,      setActiveTab]      = useState(initialTab || "conversations");
   const [propertyData,   setPropertyData]   = useState(initialPropertyData ?? null);
   const [contentLoading, setContentLoading] = useState(false);
+  const contentFetchRef = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (activeTab === "content" && propertyData === null && !contentLoading) {
-      setContentLoading(true);
-      fetch("/api/content")
-        .then(r => { if (!r.ok) throw new Error("unauthorized"); return r.json(); })
-        .then(d => { setPropertyData(d.propertyData ?? null); setContentLoading(false); })
-        .catch(() => { setContentLoading(false); });
+    if (activeTab !== "content") {
+      contentFetchRef.current = false;
+      return;
     }
-  }, [activeTab, propertyData, contentLoading]);
+    if (propertyData !== null || contentFetchRef.current) return;
+    contentFetchRef.current = true;
+    setContentLoading(true);
+    fetch("/api/content")
+      .then(r => { if (!r.ok) throw new Error("unauthorized"); return r.json(); })
+      .then(d => { setPropertyData(d.propertyData ?? null); setContentLoading(false); })
+      .catch(() => { setContentLoading(false); });
+  }, [activeTab, propertyData]);
 
   async function handleContentSave(updatedData) {
     await fetch("/api/content", {
