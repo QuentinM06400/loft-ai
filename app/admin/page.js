@@ -351,6 +351,7 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
   const [activeTab,      setActiveTab]      = useState(initialTab || "conversations");
   const [propertyData,   setPropertyData]   = useState(initialPropertyData ?? null);
   const [contentLoading, setContentLoading] = useState(false);
+  const [fetchError,     setFetchError]     = useState(false);
   const contentFetchRef = useRef(false);
   const router = useRouter();
 
@@ -362,10 +363,17 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
     if (propertyData !== null || contentFetchRef.current) return;
     contentFetchRef.current = true;
     setContentLoading(true);
-    fetch("/api/content")
-      .then(r => { if (!r.ok) throw new Error("unauthorized"); return r.json(); })
-      .then(d => { setPropertyData(d.propertyData ?? null); setContentLoading(false); })
-      .catch(() => { setContentLoading(false); });
+    setFetchError(false);
+    fetch("/api/content", { credentials: "include" })
+      .then(r => {
+        if (!r.ok) {
+          console.error("[content] fetch status:", r.status);
+          throw new Error("http_" + r.status);
+        }
+        return r.json();
+      })
+      .then(d => { setPropertyData(d.propertyData || {}); setContentLoading(false); })
+      .catch(() => { setFetchError(true); setContentLoading(false); });
   }, [activeTab, propertyData]);
 
   async function handleContentSave(updatedData) {
@@ -423,10 +431,10 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
         {activeTab === "content" && (
           contentLoading ? (
             <div style={{ textAlign: "center", padding: 60, color: "#6B6B6B", fontSize: 13 }}>Chargement du contenu...</div>
-          ) : propertyData === null ? (
+          ) : fetchError ? (
             <div style={{ textAlign: "center", padding: 60, color: "#E53E3E", fontSize: 13 }}>Impossible de charger le contenu. Vérifiez votre session.</div>
           ) : (
-            <ContentTab propertyData={propertyData} onSave={handleContentSave} />
+            <ContentTab propertyData={propertyData || {}} onSave={handleContentSave} />
           )
         )}
       </div>
