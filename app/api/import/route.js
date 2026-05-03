@@ -1,17 +1,5 @@
 import { NextResponse } from "next/server";
 
-function stripHtml(html) {
-  let text = html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<nav[\s\S]*?<\/nav>/gi, "")
-    .replace(/<footer[\s\S]*?<\/footer>/gi, "")
-    .replace(/<head[\s\S]*?<\/head>/gi, "");
-  text = text.replace(/<[^>]+>/g, " ");
-  text = text.replace(/\s+/g, " ").trim();
-  return text.slice(0, 8000);
-}
-
 const SYSTEM_PROMPT = `Tu es un extracteur de données d'annonces de location courte durée.
 Analyse le texte fourni et extrais uniquement les informations présentes.
 Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après,
@@ -78,11 +66,11 @@ export async function POST(req) {
 
     if (url && !text) {
       try {
-        const res = await fetch(url, {
+        const jinaUrl = `https://r.jina.ai/${url}`;
+        const res = await fetch(jinaUrl, {
           headers: {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-            "Accept": "text/html,application/xhtml+xml",
-            "Accept-Language": "fr-FR,fr;q=0.9",
+            "Accept": "text/plain",
+            "X-Return-Format": "markdown",
           },
         });
 
@@ -90,12 +78,7 @@ export async function POST(req) {
           return NextResponse.json({ blocked: true });
         }
 
-        const html = await res.text();
-        if (!html) {
-          return NextResponse.json({ blocked: true });
-        }
-
-        extractedText = stripHtml(html);
+        extractedText = (await res.text()).trim();
         if (!extractedText || extractedText.length < 200) {
           return NextResponse.json({ blocked: true });
         }
