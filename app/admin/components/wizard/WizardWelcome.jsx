@@ -4,7 +4,51 @@ import { C } from "./WizardUI";
 import ImportModal from "../ImportModal";
 
 export default function WizardWelcome({ onManual, onImportData }) {
-  const [showImport, setShowImport] = useState(false);
+  const [showImport,   setShowImport]   = useState(false);
+  const [importedData, setImportedData] = useState(null);
+
+  function handleImport(data) {
+    onImportData?.(data);
+    setImportedData(data);
+    setShowImport(false);
+  }
+
+  if (importedData) {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        background: "#FAFAF8", fontFamily: C.font, padding: "24px 20px",
+      }}>
+        <div style={{ textAlign: "center", maxWidth: 440 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 18, background: C.green,
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            fontSize: 28, color: "#fff", fontWeight: 800, marginBottom: 24,
+            boxShadow: "0 6px 24px rgba(42,107,90,0.35)",
+          }}>✓</div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1A1A1A", margin: "0 0 12px" }}>
+            Données importées !
+          </h2>
+          <p style={{ fontSize: 15, color: "#6B6B6B", margin: "0 0 32px", lineHeight: 1.6 }}>
+            Vous pouvez maintenant configurer votre espace depuis l'onglet Contenu.
+          </p>
+          <button
+            type="button"
+            onClick={() => { window.location.href = "/admin"; }}
+            style={{
+              padding: "14px 28px", borderRadius: 14, border: "none",
+              fontFamily: C.font, fontSize: 15, fontWeight: 700,
+              background: C.green, color: "#fff", cursor: "pointer",
+              boxShadow: "0 4px 18px rgba(42,107,90,0.3)",
+            }}
+          >
+            Accéder à l'onglet Contenu →
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -14,7 +58,7 @@ export default function WizardWelcome({ onManual, onImportData }) {
     }}>
       {showImport && (
         <ImportModal
-          onImport={data => { onImportData?.(data); setShowImport(false); }}
+          onImport={handleImport}
           onClose={() => setShowImport(false)}
         />
       )}

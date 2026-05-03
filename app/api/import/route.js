@@ -96,7 +96,7 @@ export async function POST(req) {
         }
 
         extractedText = stripHtml(html);
-        if (!extractedText) {
+        if (!extractedText || extractedText.length < 200) {
           return NextResponse.json({ blocked: true });
         }
       } catch {

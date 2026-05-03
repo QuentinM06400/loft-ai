@@ -58,6 +58,16 @@ const APPLIANCE_LABELS = {
   towelWarmer:    "Sèche-serviettes",
 };
 
+function hasAnyData(data) {
+  if (!data) return false;
+  if (Object.values(data.info    || {}).some(v => v !== null && v !== undefined && v !== "")) return true;
+  if (Object.values(data.checkin || {}).some(v => v !== null && v !== undefined && v !== "")) return true;
+  if (Object.values(data.rules   || {}).some(v => v !== null && v !== undefined && v !== "")) return true;
+  if (Object.values(data.appliances?.items || {}).some(i => i?.enabled)) return true;
+  if (Object.keys(data.appliances?.tvWizard?.streamingAccess || {}).length > 0) return true;
+  return false;
+}
+
 function PreviewRow({ label, value }) {
   if (value === null || value === undefined || value === "") return null;
   return (
@@ -296,7 +306,69 @@ export default function ImportModal({ onImport, onClose }) {
         )}
 
         {/* ── Preview ─────────────────────────────────────── */}
-        {phase === "preview" && extractedData && (
+        {phase === "preview" && extractedData && !hasAnyData(extractedData) && (
+          <>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1A1A1A", margin: "0 0 8px" }}>
+              Aucune donnée détectée
+            </h2>
+            <div style={{
+              padding: "14px 16px", borderRadius: 12,
+              background: "rgba(255,193,7,0.08)", border: "1px solid rgba(255,193,7,0.3)",
+              marginBottom: 20,
+            }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#856404", lineHeight: 1.6 }}>
+                Aucune donnée n'a pu être extraite automatiquement.<br />
+                Airbnb bloque probablement l'accès automatique à cette page.<br />
+                Copiez-collez le texte de votre annonce ci-dessous :
+              </p>
+            </div>
+            <textarea
+              value={pasteText}
+              onChange={e => setPasteText(e.target.value)}
+              rows={6}
+              placeholder="Collez ici le texte complet de votre annonce..."
+              style={{
+                width: "100%", padding: "10px 12px", borderRadius: 10,
+                border: "1px solid rgba(0,0,0,0.12)", fontFamily: FONT,
+                fontSize: 13, resize: "vertical", outline: "none",
+                boxSizing: "border-box", color: "#1A1A1A", marginBottom: 14,
+              }}
+              onFocus={e => (e.target.style.borderColor = G)}
+              onBlur={e  => (e.target.style.borderColor = "rgba(0,0,0,0.12)")}
+            />
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                type="button"
+                onClick={handleAnalyzeText}
+                disabled={!pasteText.trim()}
+                style={{
+                  flex: 1, padding: "12px 20px", borderRadius: 12,
+                  border: "none", fontFamily: FONT, fontSize: 14, fontWeight: 600,
+                  background: pasteText.trim() ? G : "rgba(0,0,0,0.08)",
+                  color: pasteText.trim() ? "#fff" : "#999",
+                  cursor: pasteText.trim() ? "pointer" : "default",
+                  boxShadow: pasteText.trim() ? "0 3px 12px rgba(42,107,90,0.25)" : "none",
+                }}
+              >
+                Analyser le texte
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhase("input")}
+                style={{
+                  padding: "12px 20px", borderRadius: 12,
+                  border: "1px solid rgba(0,0,0,0.12)", fontFamily: FONT,
+                  fontSize: 14, fontWeight: 500, background: "#fff",
+                  color: "#6B6B6B", cursor: "pointer",
+                }}
+              >
+                Retour
+              </button>
+            </div>
+          </>
+        )}
+
+        {phase === "preview" && extractedData && hasAnyData(extractedData) && (
           <>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1A1A1A", margin: "0 0 8px" }}>
               Données détectées
