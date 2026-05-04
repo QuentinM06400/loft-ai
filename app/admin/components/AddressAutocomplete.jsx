@@ -30,17 +30,15 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
       });
       ac.addListener("place_changed", () => {
         const place = ac.getPlace();
-        if (!place.address_components) return;
-        let streetNumber = "", route = "", locality = "", postalCode = "", country = "";
-        for (const c of place.address_components) {
-          if      (c.types.includes("street_number")) streetNumber = c.long_name;
-          else if (c.types.includes("route"))         route        = c.long_name;
-          else if (c.types.includes("locality"))      locality     = c.long_name;
-          else if (c.types.includes("postal_code"))   postalCode   = c.long_name;
-          else if (c.types.includes("country"))       country      = c.long_name;
-        }
-        const street = [streetNumber, route].filter(Boolean).join(" ");
-        onSelectRef.current?.({ street, city: locality, postalCode, country });
+        const components = place.address_components || [];
+        const get      = (type) => components.find(c => c.types.includes(type))?.long_name  || "";
+        const getShort = (type) => components.find(c => c.types.includes(type))?.short_name || "";
+        onSelectRef.current?.({
+          street:     `${get("street_number")} ${get("route")}`.trim(),
+          city:       get("locality") || get("postal_town"),
+          postalCode: get("postal_code"),
+          country:    get("country"),
+        });
       });
     }
 
@@ -56,7 +54,7 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
       return () => clearInterval(t);
     }
 
-    const src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&language=fr`;
+    const src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&language=fr&v=weekly`;
     console.log("[Places] Clé (10 premiers chars):", KEY.slice(0, 10) + "...");
     console.log("[Places] Chargement du script:", src.replace(KEY, KEY.slice(0, 10) + "..."));
     const script    = document.createElement("script");
