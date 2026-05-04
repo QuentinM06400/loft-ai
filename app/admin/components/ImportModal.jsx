@@ -96,6 +96,7 @@ export default function ImportModal({ onImport, onClose }) {
   const [url, setUrl]               = useState("");
   const [rgpd, setRgpd]             = useState(false);
   const [blocked, setBlocked]       = useState(false);
+  const [blockReason, setBlockReason] = useState(null);
   const [pasteText, setPasteText]   = useState("");
   const [urlError, setUrlError]     = useState("");
   const [extractedData, setExtractedData] = useState(null);
@@ -115,6 +116,7 @@ export default function ImportModal({ onImport, onClose }) {
 
       if (json.blocked) {
         setBlocked(true);
+        setBlockReason(json.reason || null);
         setPhase("input");
         return;
       }
@@ -197,7 +199,7 @@ export default function ImportModal({ onImport, onClose }) {
               <input
                 type="url"
                 value={url}
-                onChange={e => { setUrl(e.target.value); setBlocked(false); setUrlError(""); }}
+                onChange={e => { setUrl(e.target.value); setBlocked(false); setBlockReason(null); setUrlError(""); }}
                 placeholder="https://www.airbnb.fr/rooms/..."
                 style={{
                   width: "100%", padding: "11px 14px", borderRadius: 10,
@@ -221,8 +223,9 @@ export default function ImportModal({ onImport, onClose }) {
                 marginBottom: 16,
               }}>
                 <p style={{ margin: "0 0 10px", fontSize: 13, color: "#856404", lineHeight: 1.5 }}>
-                  Import automatique indisponible pour cette URL.
-                  Copiez-collez le texte de votre annonce ci-dessous :
+                  {blockReason === "timeout"
+                    ? "L'analyse a pris trop de temps. Réessayez ou copiez-collez le texte."
+                    : "Import automatique indisponible pour cette URL. Copiez-collez le texte de votre annonce ci-dessous :"}
                 </p>
                 <textarea
                   value={pasteText}

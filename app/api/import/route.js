@@ -68,14 +68,23 @@ export async function POST(req) {
     if (url && !text) {
       try {
         const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
-        const result = await app.scrapeUrl(url, { formats: ["markdown"] });
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 9000)
+        );
+        const result = await Promise.race([
+          app.scrapeUrl(url, { formats: ["markdown"] }),
+          timeoutPromise,
+        ]);
 
         if (!result.success || !result.markdown || result.markdown.length < 200) {
           return NextResponse.json({ blocked: true });
         }
 
         extractedText = result.markdown;
-      } catch {
+      } catch (e) {
+        if (e.message === "timeout") {
+          return NextResponse.json({ blocked: true, reason: "timeout" });
+        }
         return NextResponse.json({ blocked: true });
       }
     }
