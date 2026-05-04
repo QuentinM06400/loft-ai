@@ -1281,26 +1281,15 @@ function QuartierSection({ propertyData, onSave }) {
 // ContentTab
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ContentTab({ propertyData, onSave }) {
+export default function ContentTab({ propertyData, onSave, onImport }) {
   const pd = propertyData || {};
   const [showImport, setShowImport] = useState(false);
-
-  async function handleImport(data) {
-    const merged = {
-      ...pd,
-      ...(data.info     ? { info:     { ...(pd.info     || {}), ...data.info     } } : {}),
-      ...(data.checkin  ? { checkin:  { ...(pd.checkin  || {}), ...data.checkin  } } : {}),
-      ...(data.rules    ? { rules:    { ...(pd.rules    || {}), ...data.rules    } } : {}),
-      ...(data.appliances ? { appliances: { ...(pd.appliances || {}), ...data.appliances } } : {}),
-    };
-    await onSave(merged);
-  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {showImport && (
         <ImportModal
-          onImport={data => { handleImport(data); setShowImport(false); }}
+          onImport={data => { setShowImport(false); onImport ? onImport(data) : onSave({ ...pd, ...data }); }}
           onClose={() => setShowImport(false)}
         />
       )}

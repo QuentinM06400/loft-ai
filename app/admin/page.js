@@ -347,9 +347,24 @@ function ResetDataButton({ onReset }) {
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
+function deepMerge(base, override) {
+  const result = { ...base };
+  for (const key of Object.keys(override || {})) {
+    const ov = override[key];
+    const bv = base?.[key];
+    if (ov !== null && ov !== undefined && typeof ov === "object" && !Array.isArray(ov) && typeof bv === "object" && bv !== null) {
+      result[key] = deepMerge(bv, ov);
+    } else if (ov !== null && ov !== undefined) {
+      result[key] = ov;
+    }
+  }
+  return result;
+}
+
 function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPropertyData }) {
   const [activeTab,      setActiveTab]      = useState(initialTab || "conversations");
   const [propertyData,   setPropertyData]   = useState(initialPropertyData ?? null);
+  const [contentKey,     setContentKey]     = useState(0);
   const [contentLoading, setContentLoading] = useState(false);
   const [fetchError,     setFetchError]     = useState(false);
   const contentFetchRef = useRef(false);
@@ -379,10 +394,23 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
   async function handleContentSave(updatedData) {
     await fetch("/api/content", {
       method: "PUT",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ propertyData: updatedData }),
     });
     setPropertyData(updatedData);
+  }
+
+  async function handleImport(importedData) {
+    const merged = deepMerge(propertyData || {}, importedData);
+    await fetch("/api/content", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ propertyData: merged }),
+    });
+    setPropertyData(merged);
+    setContentKey(k => k + 1);
   }
 
   return (
@@ -434,7 +462,7 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
           ) : fetchError ? (
             <div style={{ textAlign: "center", padding: 60, color: "#E53E3E", fontSize: 13 }}>Impossible de charger le contenu. Vérifiez votre session.</div>
           ) : (
-            <ContentTab propertyData={propertyData || {}} onSave={handleContentSave} />
+            <ContentTab key={contentKey} propertyData={propertyData || {}} onSave={handleContentSave} onImport={handleImport} />
           )
         )}
       </div>
