@@ -61,7 +61,11 @@ Texte de l'annonce :
 
 export async function POST(req) {
   try {
-    const { url, text } = await req.json();
+    const body = await req.json();
+    console.log("[import] route appelée");
+    console.log("[import] FIRECRAWL_API_KEY présente:", !!process.env.FIRECRAWL_API_KEY);
+    console.log("[import] body reçu:", JSON.stringify(body));
+    const { url, text } = body;
 
     let extractedText = text || "";
 
