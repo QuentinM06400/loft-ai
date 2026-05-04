@@ -1,2 +1,25 @@
 @import "tailwindcss";
 body { margin: 0; padding: 0; }
+
+gmp-place-autocomplete {
+  width: 100%;
+  display: block;
+}
+
+gmp-place-autocomplete::part(input) {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #111827;
+  background: white;
+  outline: none;
+  box-sizing: border-box;
+}
+
+gmp-place-autocomplete::part(input):focus {
+  border-color: #2d5a3d;
+  box-shadow: 0 0 0 2px rgba(45,90,61,0.15);
+}

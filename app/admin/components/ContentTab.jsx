@@ -213,6 +213,7 @@ function LogementSection({ propertyData, onSave }) {
   const set = (k, v) => setD(prev => ({ ...prev, [k]: v }));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
+  const [showAddressDetails, setShowAddressDetails] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
@@ -235,29 +236,41 @@ function LogementSection({ propertyData, onSave }) {
         </Row>
 
         <SubTitle>Adresse</SubTitle>
-        <Row cols={3}>
-          <Field label="Adresse" style={{ gridColumn: "span 2" }}>
-            <AddressAutocomplete
-              value={d.address}
-              onChange={v => set("address", v)}
-              onSelect={({ street, city, postalCode, country }) =>
-                setD(prev => ({ ...prev, address: street, city, postalCode, country }))
-              }
-              placeholder="Rue et numéro"
-            />
-          </Field>
-          <Field label="Code postal">
-            <Inp value={d.postalCode} onChange={v => set("postalCode", v)} placeholder="06400" />
-          </Field>
-        </Row>
-        <Row>
-          <Field label="Ville">
-            <Inp value={d.city} onChange={v => set("city", v)} placeholder="Cannes" />
-          </Field>
-          <Field label="Pays">
-            <Inp value={d.country} onChange={v => set("country", v)} placeholder="France" />
-          </Field>
-        </Row>
+        <Field label="Adresse">
+          <AddressAutocomplete
+            value={d.address}
+            onChange={v => set("address", v)}
+            onSelect={({ street, city, postalCode, country }) => {
+              setD(prev => ({ ...prev, address: street, city, postalCode, country }));
+              setShowAddressDetails(false);
+            }}
+            placeholder="Rue et numéro"
+          />
+        </Field>
+        <button
+          type="button"
+          onClick={() => setShowAddressDetails(v => !v)}
+          style={{
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+            fontSize: 12, color: "#6B6B6B", fontFamily: FONT, textAlign: "left",
+            textDecoration: "underline", marginTop: -6,
+          }}
+        >
+          {showAddressDetails ? "Masquer les détails" : "Remplir l'adresse manuellement →"}
+        </button>
+        {showAddressDetails && (
+          <Row cols={3}>
+            <Field label="Code postal">
+              <Inp value={d.postalCode} onChange={v => set("postalCode", v)} placeholder="06400" />
+            </Field>
+            <Field label="Ville">
+              <Inp value={d.city} onChange={v => set("city", v)} placeholder="Cannes" />
+            </Field>
+            <Field label="Pays">
+              <Inp value={d.country} onChange={v => set("country", v)} placeholder="France" />
+            </Field>
+          </Row>
+        )}
 
         <Row>
           <Field label="Étage">
