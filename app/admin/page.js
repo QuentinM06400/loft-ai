@@ -432,9 +432,11 @@ function Dashboard({ hostId, initialTab, onLogout, onRestartWizard, initialPrope
           >⚙️ Super-admin</button>
         )}
 
-        <button onClick={onRestartWizard} style={{ padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, border: `1px solid rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.05)", color: G, cursor: "pointer", fontFamily: FONT, marginRight: 8 }}>
-          🧭 Assistant de configuration
-        </button>
+        {hostId === "cannes-loft" && (
+          <button onClick={onRestartWizard} style={{ padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, border: `1px solid rgba(42,107,90,0.3)`, background: "rgba(42,107,90,0.05)", color: G, cursor: "pointer", fontFamily: FONT, marginRight: 8 }}>
+            🧭 Assistant de configuration
+          </button>
+        )}
         <ResetDataButton onReset={onRestartWizard} />
         <button onClick={onLogout} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 500, border: "1px solid rgba(0,0,0,0.1)", background: "transparent", color: "#6B6B6B", cursor: "pointer", fontFamily: FONT }}>
           {t("admin.logout")}
