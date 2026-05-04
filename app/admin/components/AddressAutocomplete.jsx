@@ -25,6 +25,9 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
     const loadAndInit = () => {
       if (!window.google?.maps?.places?.PlaceAutocompleteElement) return;
 
+      // Capture the initial value from Redis before replacing the DOM node
+      const initialValue = inputRef.current?.value || "";
+
       const element = new google.maps.places.PlaceAutocompleteElement({
         types: ["address"],
         componentRestrictions: { country: ["fr", "mc", "be", "ch", "lu"] },
@@ -33,6 +36,9 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
 
       const container = inputRef.current?.parentNode;
       if (container) container.replaceChild(element, inputRef.current);
+
+      // Initialise l'affichage avec la valeur courante (adresse stockée en Redis)
+      if (initialValue) element.value = initialValue;
 
       element.addEventListener("gmp-placeselect", async ({ place }) => {
         await place.fetchFields({ fields: ["addressComponents"] });
