@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { RECOMMENDATION_CATEGORIES, ACTIVITY_CATEGORIES, TRANSPORT_CATEGORIES } from "@/app/lib/propertySchema";
 import ImportModal from "./ImportModal";
+import AddressAutocomplete from "./AddressAutocomplete";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Design tokens
@@ -236,7 +237,14 @@ function LogementSection({ propertyData, onSave }) {
         <SubTitle>Adresse</SubTitle>
         <Row cols={3}>
           <Field label="Adresse" style={{ gridColumn: "span 2" }}>
-            <Inp value={d.address} onChange={v => set("address", v)} placeholder="Rue et numéro" />
+            <AddressAutocomplete
+              value={d.address}
+              onChange={v => set("address", v)}
+              onSelect={({ street, city, postalCode, country }) =>
+                setD(prev => ({ ...prev, address: street, city, postalCode, country }))
+              }
+              placeholder="Rue et numéro"
+            />
           </Field>
           <Field label="Code postal">
             <Inp value={d.postalCode} onChange={v => set("postalCode", v)} placeholder="06400" />
