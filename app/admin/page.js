@@ -467,7 +467,7 @@ export default function AdminPage() {
 
   async function checkOnboarding() {
     try {
-      const res  = await fetch("/api/content");
+      const res  = await fetch("/api/content", { credentials: "include" });
       if (!res.ok) { setUiState("wizard"); return; }
       const data = await res.json();
       if (data.propertyData) {
@@ -496,10 +496,10 @@ export default function AdminPage() {
     setUiState("login");
   }
 
-  function handleWizardFinish(savedData, goToSection) {
+  function handleWizardFinish(savedData) {
     if (savedData) setPropertyData(savedData);
+    setInitialTab("content");
     setUiState("dashboard");
-    if (goToSection) setInitialTab("content");
   }
 
   if (uiState === "loading") {
