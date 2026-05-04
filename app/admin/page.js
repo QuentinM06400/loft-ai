@@ -530,6 +530,17 @@ export default function AdminPage() {
     setUiState("dashboard");
   }
 
+  async function handleWizardImport(data) {
+    const merged = deepMerge(propertyData || {}, data);
+    await fetch("/api/content", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ propertyData: merged }),
+    });
+    setPropertyData(merged);
+  }
+
   if (uiState === "loading") {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAFAF8", fontFamily: FONT }}>
@@ -552,6 +563,7 @@ export default function AdminPage() {
     <WizardContainer
       password="session"
       onFinish={handleWizardFinish}
+      onImportData={handleWizardImport}
     />
   );
 

@@ -59,7 +59,7 @@ function ProgressBar({ step }) {
 }
 
 // ── WizardContainer ────────────────────────────────────────────────────────────
-export default function WizardContainer({ password, onFinish }) {
+export default function WizardContainer({ password, onFinish, onImportData }) {
   const [showWelcome, setShowWelcome] = useState(true);
   const [step, setStep] = useState(0);
   const [wizardData, setWizardData] = useState({});
@@ -165,13 +165,15 @@ export default function WizardContainer({ password, onFinish }) {
   }
 
   function handleImportData(data) {
-    setWizardData(prev => ({
-      ...prev,
-      ...(data.info     ? { info:     { ...(prev.info     || {}), ...data.info     } } : {}),
-      ...(data.checkin  ? { checkin:  { ...(prev.checkin  || {}), ...data.checkin  } } : {}),
-      ...(data.rules    ? { rules:    { ...(prev.rules    || {}), ...data.rules    } } : {}),
-      ...(data.appliances ? { appliances: { ...(prev.appliances || {}), ...data.appliances } } : {}),
-    }));
+    const merged = {
+      ...wizardData,
+      ...(data.info     ? { info:     { ...(wizardData.info     || {}), ...data.info     } } : {}),
+      ...(data.checkin  ? { checkin:  { ...(wizardData.checkin  || {}), ...data.checkin  } } : {}),
+      ...(data.rules    ? { rules:    { ...(wizardData.rules    || {}), ...data.rules    } } : {}),
+      ...(data.appliances ? { appliances: { ...(wizardData.appliances || {}), ...data.appliances } } : {}),
+    };
+    setWizardData(merged);
+    onImportData?.(data);
     setShowWelcome(false);
     setStep(0);
   }
