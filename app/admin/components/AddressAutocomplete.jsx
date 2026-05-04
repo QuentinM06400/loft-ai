@@ -17,22 +17,27 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
   const onSelectRef = useRef(onSelect);
   useEffect(() => { onSelectRef.current = onSelect; });
 
-  useEffect(() => {
-    const KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
-    if (!KEY || !inputRef.current) return;
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
 
-    function init() {
-      if (!inputRef.current) return;
-      const ac = new window.google.maps.places.Autocomplete(inputRef.current, {
+  useEffect(() => {
+    if (!apiKey) return;
+
+    const loadAndInit = () => {
+      if (!window.google?.maps?.places?.PlaceAutocompleteElement) return;
+
+      const element = new google.maps.places.PlaceAutocompleteElement({
         types: ["address"],
         componentRestrictions: { country: ["fr", "mc", "be", "ch", "lu"] },
-        fields: ["address_components"],
       });
-      ac.addListener("place_changed", () => {
-        const place = ac.getPlace();
-        const components = place.address_components || [];
-        const get      = (type) => components.find(c => c.types.includes(type))?.long_name  || "";
-        const getShort = (type) => components.find(c => c.types.includes(type))?.short_name || "";
+      element.style.width = "100%";
+
+      const container = inputRef.current?.parentNode;
+      if (container) container.replaceChild(element, inputRef.current);
+
+      element.addEventListener("gmp-placeselect", async ({ place }) => {
+        await place.fetchFields({ fields: ["addressComponents"] });
+        const components = place.addressComponents || [];
+        const get = (type) => components.find(c => c.types.includes(type))?.longText || "";
         onSelectRef.current?.({
           street:     `${get("street_number")} ${get("route")}`.trim(),
           city:       get("locality") || get("postal_town"),
@@ -40,31 +45,25 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
           country:    get("country"),
         });
       });
-    }
+    };
 
     if (window.google?.maps?.places) {
-      init();
+      loadAndInit();
       return;
     }
 
-    if (document.getElementById(SCRIPT_ID)) {
-      const t = setInterval(() => {
-        if (window.google?.maps?.places) { clearInterval(t); init(); }
-      }, 100);
-      return () => clearInterval(t);
-    }
+    if (document.getElementById(SCRIPT_ID)) return;
 
-    const src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&language=fr&v=weekly`;
-    console.log("[Places] Clé (10 premiers chars):", KEY.slice(0, 10) + "...");
-    console.log("[Places] Chargement du script:", src.replace(KEY, KEY.slice(0, 10) + "..."));
     const script    = document.createElement("script");
     script.id       = SCRIPT_ID;
-    script.src      = src;
+    script.src      = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=fr&v=weekly`;
     script.async    = true;
-    script.onload   = init;
-    script.onerror  = () => console.error("[Places] Échec du chargement du script Google Maps");
+    script.onload   = loadAndInit;
+    script.onerror  = () => console.error("[Places] Échec du chargement");
+    console.log("[Places] Clé (10 premiers chars):", apiKey.slice(0, 10) + "...");
+    console.log("[Places] Chargement du script:", script.src.replace(apiKey, apiKey.slice(0, 10) + "..."));
     document.head.appendChild(script);
-  }, []); // load once
+  }, [apiKey]);
 
   return (
     <input
