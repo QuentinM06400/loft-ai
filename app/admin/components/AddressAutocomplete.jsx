@@ -56,11 +56,15 @@ export default function AddressAutocomplete({ value, onChange, onSelect, placeho
       return () => clearInterval(t);
     }
 
+    const src = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&language=fr`;
+    console.log("[Places] Clé (10 premiers chars):", KEY.slice(0, 10) + "...");
+    console.log("[Places] Chargement du script:", src.replace(KEY, KEY.slice(0, 10) + "..."));
     const script    = document.createElement("script");
     script.id       = SCRIPT_ID;
-    script.src      = `https://maps.googleapis.com/maps/api/js?key=${KEY}&libraries=places&language=fr`;
+    script.src      = src;
     script.async    = true;
     script.onload   = init;
+    script.onerror  = () => console.error("[Places] Échec du chargement du script Google Maps");
     document.head.appendChild(script);
   }, []); // load once
 
